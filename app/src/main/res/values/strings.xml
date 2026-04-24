@@ -328,6 +328,37 @@
     <string name="premium_restore_in_progress">Checking your premium status...</string>
     <string name="premium_already_active">Premium is already active.</string>
     <string name="premium_purchase_success">Premium unlocked! Additional protection features are now enabled.</string>
+    <string name="compassionate_access_title">I Can\'t Afford to Pay</string>
+    <string name="compassionate_access_description">Islamic Rahmah (Mercy): digital protection should be available to everyone. We trust you to be honest about your situation (amanah).</string>
+    <string name="compassionate_access_button">Request Free Access</string>
+    <string name="compassionate_access_intro_message">This program is for people who are genuinely in financial need. We ask you to be truthful about your situation. If you proceed, DeenShield will grant 1 year of free premium access on this device.</string>
+    <string name="compassionate_access_intro_positive">I\'m in financial need</string>
+    <string name="compassionate_access_form_title">Free Premium Access Request</string>
+    <string name="compassionate_access_form_message">Enter your details below. Name is required, email is optional for account recovery, and an App ID will be generated automatically.</string>
+    <string name="compassionate_access_name_hint">Your name</string>
+    <string name="compassionate_access_email_hint">Email address (optional)</string>
+    <string name="compassionate_access_proceed">Proceed</string>
+    <string name="compassionate_access_name_required">Please enter your name to continue.</string>
+    <string name="compassionate_access_email_invalid">Enter a valid email address or leave it blank.</string>
+    <string name="compassionate_access_success_title">Free access activated</string>
+    <string name="compassionate_access_success_message">Your 1-year DeenShield premium access is now active.\n\nApp ID: %1$s\nEmail: %2$s\n\nIf you need further help, visit alhaq-initiative.org/DeenShield/premium, visit alhaq-initiative.org/DeenShield/pay if your situation changes, or email support@alhaq-initiative.org with your App ID.</string>
+    <string name="compassionate_access_no_email_value">Not provided</string>
+    <string name="compassionate_access_error">Could not activate free access. Please contact support@alhaq-initiative.org.</string>
+    <string name="compassionate_access_active">Free access active</string>
+    <string name="compassionate_access_active_description">You currently have a compassionate-access premium grant on this device.</string>
+    <string name="compassionate_access_account_type">Compassionate Access</string>
+    <string name="profile_compassionate_access_option">I can\'t afford to pay</string>
+    <string name="profile_premium_access_title">Premium Access</string>
+    <string name="profile_special_access_option">I have a Special Access ID</string>
+    <string name="special_access_active">Special Access Active</string>
+    <string name="special_access_active_description">You have special access granted by Al-Haq Initiative.</string>
+    <string name="special_user">Special User</string>
+    <string name="special_access_hint">Enter Special Access ID</string>
+    <string name="special_access_title">Special Access</string>
+    <string name="special_access_message">If you\'ve contacted contact@alhaq-initiative.org and received a special access ID, enter it below. This grants one year of premium access.</string>
+    <string name="special_access_activate">Activate</string>
+    <string name="special_access_success">Special access activated.</string>
+    <string name="special_access_invalid">Invalid access ID. Please check it and try again, or contact contact@alhaq-initiative.org.</string>
     
     <!-- Profile Screen -->
     <string name="account">Account</string>

@@ -114,9 +114,15 @@ class ProfileFragment : Fragment() {
         when (userType) {
             PremiumManager.UserType.SPECIAL -> {
                 binding.premiumBadge.visibility = View.VISIBLE
-                binding.premiumStatusTitle.text = "Special Access Active"
-                binding.premiumStatusDescription.text = "You have special access granted by Al-Haq Initiative. Thank you for contacting us!"
-                binding.accountType.text = "Special User"
+                binding.premiumStatusTitle.text = getString(R.string.special_access_active)
+                binding.premiumStatusDescription.text = getString(R.string.special_access_active_description)
+                binding.accountType.text = getString(R.string.special_user)
+            }
+            PremiumManager.UserType.COMPASSIONATE -> {
+                binding.premiumBadge.visibility = View.VISIBLE
+                binding.premiumStatusTitle.text = getString(R.string.compassionate_access_active)
+                binding.premiumStatusDescription.text = getString(R.string.compassionate_access_active_description)
+                binding.accountType.text = getString(R.string.compassionate_access_account_type)
             }
             PremiumManager.UserType.PREMIUM -> {
                 binding.premiumBadge.visibility = View.VISIBLE
@@ -181,13 +187,14 @@ class ProfileFragment : Fragment() {
 
     private fun showPremiumOptionsDialog() {
         val options = arrayOf(
-            "Upgrade to Premium",
-            "I have a Special Access ID",
-            "Cancel"
+            getString(R.string.upgrade_to_premium),
+            getString(R.string.profile_compassionate_access_option),
+            getString(R.string.profile_special_access_option),
+            getString(R.string.cancel)
         )
         
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Premium Access")
+            .setTitle(R.string.profile_premium_access_title)
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> {
@@ -197,10 +204,14 @@ class ProfileFragment : Fragment() {
                         startActivity(intent)
                     }
                     1 -> {
-                        // Show special ID input dialog
+                        val intent = Intent(requireContext(), FragmentActivity::class.java)
+                        intent.putExtra("feature_type", "premium_features")
+                        startActivity(intent)
+                    }
+                    2 -> {
                         showSpecialAccessDialog()
                     }
-                    // 2 is cancel, do nothing
+                    // 3 is cancel, do nothing
                 }
             }
             .show()
@@ -208,32 +219,32 @@ class ProfileFragment : Fragment() {
 
     private fun showSpecialAccessDialog() {
         val input = android.widget.EditText(requireContext()).apply {
-            hint = "Enter Special Access ID"
+            hint = getString(R.string.special_access_hint)
             inputType = android.text.InputType.TYPE_CLASS_TEXT
         }
         
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Special Access")
-            .setMessage("If you've contacted contact@alhaq-initiative.org and received a special access ID, please enter it below.\n\nThis ID grants you one year of premium access.")
+            .setTitle(R.string.special_access_title)
+            .setMessage(getString(R.string.special_access_message))
             .setView(input)
-            .setPositiveButton("Activate") { _, _ ->
+            .setPositiveButton(R.string.special_access_activate) { _, _ ->
                 val accessId = input.text.toString()
                 if (premiumManager.setSpecialAccessId(accessId)) {
                     Toast.makeText(
                         requireContext(),
-                        "Special access activated! Thank you for contacting us.",
+                        R.string.special_access_success,
                         Toast.LENGTH_LONG
                     ).show()
                     loadProfileData()
                 } else {
                     Toast.makeText(
                         requireContext(),
-                        "Invalid access ID. Please check and try again, or contact contact@alhaq-initiative.org",
+                        R.string.special_access_invalid,
                         Toast.LENGTH_LONG
                     ).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 

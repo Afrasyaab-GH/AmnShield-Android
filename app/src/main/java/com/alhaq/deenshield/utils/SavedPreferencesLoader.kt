@@ -29,6 +29,40 @@ class SavedPreferencesLoader(private val context: Context) {
         return sharedPreferences.getStringSet("blocked_apps", emptySet()) ?: emptySet()
     }
 
+    fun saveAppBlockerCooldownData(cooldowns: Map<String, Long>) {
+        val sharedPreferences =
+            context.getSharedPreferences("app_blocker", Context.MODE_PRIVATE)
+        val json = Gson().toJson(cooldowns)
+        sharedPreferences.edit().putString("cooldown_data", json).commit()
+    }
+
+    fun loadAppBlockerCooldownData(): MutableMap<String, Long> {
+        val sharedPreferences =
+            context.getSharedPreferences("app_blocker", Context.MODE_PRIVATE)
+        val json = sharedPreferences.getString("cooldown_data", null)
+        if (json.isNullOrEmpty()) return mutableMapOf()
+
+        val type = object : TypeToken<MutableMap<String, Long>>() {}.type
+        return Gson().fromJson(json, type)
+    }
+
+    fun saveViewBlockerCooldownData(cooldowns: Map<String, Long>) {
+        val sharedPreferences =
+            context.getSharedPreferences("view_blocker", Context.MODE_PRIVATE)
+        val json = Gson().toJson(cooldowns)
+        sharedPreferences.edit().putString("cooldown_data", json).commit()
+    }
+
+    fun loadViewBlockerCooldownData(): MutableMap<String, Long> {
+        val sharedPreferences =
+            context.getSharedPreferences("view_blocker", Context.MODE_PRIVATE)
+        val json = sharedPreferences.getString("cooldown_data", null)
+        if (json.isNullOrEmpty()) return mutableMapOf()
+
+        val type = object : TypeToken<MutableMap<String, Long>>() {}.type
+        return Gson().fromJson(json, type)
+    }
+
     fun loadBlockedKeywords(): Set<String> {
         val sharedPreferences =
             context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
@@ -395,6 +429,38 @@ class SavedPreferencesLoader(private val context: Context) {
 
     fun setSpecialAccessId(accessId: String) {
         getPremiumPrefs().edit().putString("special_access_id", accessId).commit()
+    }
+
+    private fun getCompassionateAccessPrefs(): android.content.SharedPreferences {
+        return context.getSharedPreferences("compassionate_access", Context.MODE_PRIVATE)
+    }
+
+    fun saveCompassionateAccessGrant(
+        appId: String,
+        userName: String,
+        email: String?,
+        grantedAt: Long,
+        expiresAt: Long
+    ) {
+        getCompassionateAccessPrefs().edit()
+            .putString("app_id", appId)
+            .putString("user_name", userName)
+            .putString("email", email.orEmpty())
+            .putLong("granted_at", grantedAt)
+            .putLong("expires_at", expiresAt)
+            .commit()
+    }
+
+    fun getCompassionateAccessAppId(): String {
+        return getCompassionateAccessPrefs().getString("app_id", "") ?: ""
+    }
+
+    fun getCompassionateAccessExpiry(): Long {
+        return getCompassionateAccessPrefs().getLong("expires_at", 0L)
+    }
+
+    fun clearCompassionateAccessGrant() {
+        getCompassionateAccessPrefs().edit().clear().commit()
     }
 
 }

@@ -85,9 +85,19 @@ class ViewBlocker : BaseBlocker() {
         cooldownViewIdsList[viewId] = endTime
     }
 
+    fun restoreCooldowns(cooldowns: Map<String, Long>) {
+        cooldownViewIdsList.clear()
+        val now = System.currentTimeMillis()
+        cooldownViewIdsList.putAll(cooldowns.filterValues { it > now })
+    }
+
+    fun getCooldownSnapshot(): Map<String, Long> {
+        return HashMap(cooldownViewIdsList)
+    }
+
     private fun isCooldownActive(viewId: String): Boolean {
         val cooldownEnd = cooldownViewIdsList[viewId] ?: return false
-        if (SystemClock.uptimeMillis() > cooldownEnd) {
+        if (System.currentTimeMillis() > cooldownEnd) {
             cooldownViewIdsList.remove(viewId)
             return false
         }

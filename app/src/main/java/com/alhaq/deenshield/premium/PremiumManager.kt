@@ -10,6 +10,7 @@ class PremiumManager private constructor(context: Context) {
 
     enum class UserType {
         FREE,
+        COMPASSIONATE,
         PREMIUM,
         SPECIAL
     }
@@ -18,7 +19,11 @@ class PremiumManager private constructor(context: Context) {
      * Check if user has premium or special access
      */
     fun isPremium(): Boolean {
-        return preferencesLoader.isPremiumUser() || isSpecialUser()
+        return preferencesLoader.isPremiumUser() || isSpecialUser() || isCompassionateAccessActive()
+    }
+
+    fun isCompassionateAccessActive(): Boolean {
+        return preferencesLoader.getCompassionateAccessExpiry() > System.currentTimeMillis()
     }
 
     /**
@@ -35,6 +40,7 @@ class PremiumManager private constructor(context: Context) {
     fun getUserType(): UserType {
         return when {
             isSpecialUser() -> UserType.SPECIAL
+            isCompassionateAccessActive() -> UserType.COMPASSIONATE
             preferencesLoader.isPremiumUser() -> UserType.PREMIUM
             else -> UserType.FREE
         }
@@ -46,6 +52,7 @@ class PremiumManager private constructor(context: Context) {
     fun getUserTypeLabel(): String {
         return when (getUserType()) {
             UserType.FREE -> "Free"
+            UserType.COMPASSIONATE -> "Compassionate Access"
             UserType.PREMIUM -> "Premium"
             UserType.SPECIAL -> "Special"
         }

@@ -1,9 +1,12 @@
 package com.alhaq.deenshield.ui.fragments.features
 
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.billingclient.api.BillingClient
@@ -13,12 +16,15 @@ import com.alhaq.deenshield.databinding.FragmentPremiumFeaturesBinding
 import com.alhaq.deenshield.premium.PremiumManager
 import com.alhaq.deenshield.premium.PremiumProducts
 import com.alhaq.deenshield.utils.BillingClientWrapper
+import com.alhaq.deenshield.utils.SavedPreferencesLoader
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class PremiumFeaturesFragment : Fragment() {
 
     private var _binding: FragmentPremiumFeaturesBinding? = null
     private val binding get() = _binding!!
     private val premiumManager by lazy { PremiumManager.getInstance(requireContext().applicationContext) }
+    private val preferencesLoader by lazy { SavedPreferencesLoader(requireContext().applicationContext) }
     private lateinit var billingClientWrapper: BillingClientWrapper
     private val products = mutableMapOf<String, ProductDetails>()
 
@@ -62,6 +68,9 @@ class PremiumFeaturesFragment : Fragment() {
         }
         binding.btnRestore.setOnClickListener {
             restorePurchases()
+        }
+        binding.btnCompassionateAccess.setOnClickListener {
+            showCompassionateAccessDialog()
         }
     }
 
@@ -126,6 +135,105 @@ class PremiumFeaturesFragment : Fragment() {
             products[PremiumProducts.PRODUCT_YEARLY]?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.let { phase ->
                 binding.txtYearlyPrice.text = phase.formattedPrice
             }
+        }
+    }
+
+    private fun showCompassionateAccessDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.compassionate_access_title)
+            .setMessage(getString(R.string.compassionate_access_intro_message))
+            .setPositiveButton(R.string.compassionate_access_intro_positive) { _, _ ->
+                showCompassionateAccessForm()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showCompassionateAccessForm() {
+        val context = requireContext()
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            val horizontalPadding = resources.getDimensionPixelSize(R.dimen.padding_normal)
+            setPadding(horizontalPadding, 0, horizontalPadding, 0)
+        }
+
+        val nameInput = EditText(context).apply {
+            hint = getString(R.string.compassionate_access_name_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS
+        }
+
+        val emailInput = EditText(context).apply {
+            hint = getString(R.string.compassionate_access_email_hint)
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        }
+
+        container.addView(nameInput)
+        container.addView(emailInput)
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.compassionate_access_form_title)
+            .setMessage(getString(R.string.compassionate_access_form_message))
+            .setView(container)
+            .setPositiveButton(R.string.compassionate_access_proceed, null)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+            .also { dialog ->
+                dialog.setOnShowListener {
+                    dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        val name = nameInput.text?.toString()?.trim().orEmpty()
+                        val email = emailInput.text?.toString()?.trim().orEmpty()
+
+                        if (name.isEmpty()) {
+                            nameInput.error = getString(R.string.compassionate_access_name_required)
+                            return@setOnClickListener
+                        }
+
+                        if (email.isNotEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                            emailInput.error = getString(R.string.compassionate_access_email_invalid)
+                            return@setOnClickListener
+                        }
+
+                        dialog.dismiss()
+                        grantCompassionateAccess(name, email.ifBlank { null })
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun grantCompassionateAccess(userName: String, email: String?) {
+        val grantedAt = System.currentTimeMillis()
+        val appId = "CAP-$grantedAt-${(10000..99999).random()}"
+        val expiresAt = grantedAt + (365L * 24 * 60 * 60 * 1000)
+
+        try {
+            preferencesLoader.saveCompassionateAccessGrant(
+                appId = appId,
+                userName = userName,
+                email = email,
+                grantedAt = grantedAt,
+                expiresAt = expiresAt
+            )
+            premiumManager.resetReminderWindow()
+            updatePremiumState()
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.compassionate_access_success_title)
+                .setMessage(
+                    getString(
+                        R.string.compassionate_access_success_message,
+                        appId,
+                        email ?: getString(R.string.compassionate_access_no_email_value)
+                    )
+                )
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        } catch (_: Exception) {
+            Toast.makeText(
+                requireContext(),
+                R.string.compassionate_access_error,
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 }

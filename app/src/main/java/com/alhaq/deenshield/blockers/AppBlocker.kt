@@ -37,8 +37,9 @@ class AppBlocker:BaseBlocker() {
         }
 
         if(cooldownAppsList.containsKey(packageName)){
+            val now = System.currentTimeMillis()
             // check if app has surpassed the cooldown period
-            if (cooldownAppsList[packageName]!! < SystemClock.uptimeMillis()){
+            if (cooldownAppsList[packageName]!! <= now){
                 removeCooldownFrom(packageName)
                 return AppBlockerResult(isBlocked = true)
             }
@@ -69,6 +70,16 @@ class AppBlocker:BaseBlocker() {
 
     fun removeCooldownFrom(packageName: String) {
         cooldownAppsList.remove(packageName)
+    }
+
+    fun restoreCooldowns(cooldowns: Map<String, Long>) {
+        cooldownAppsList.clear()
+        val now = System.currentTimeMillis()
+        cooldownAppsList.putAll(cooldowns.filterValues { it > now })
+    }
+
+    fun getCooldownSnapshot(): Map<String, Long> {
+        return HashMap(cooldownAppsList)
     }
 
     /**
