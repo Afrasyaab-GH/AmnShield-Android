@@ -1,6 +1,7 @@
 package com.alhaq.deenshield.utils
 
 import android.content.Context
+import com.alhaq.deenshield.blockers.ReelBlocker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.alhaq.deenshield.blockers.FocusModeBlocker
@@ -33,7 +34,9 @@ class SavedPreferencesLoader(private val context: Context) {
         val sharedPreferences =
             context.getSharedPreferences("app_blocker", Context.MODE_PRIVATE)
         val json = Gson().toJson(cooldowns)
-        sharedPreferences.edit().putString("cooldown_data", json).commit()
+        // apply() is asynchronous; cooldown data is non-critical and called frequently
+        // from the accessibility hot path so we avoid synchronous disk writes here.
+        sharedPreferences.edit().putString("cooldown_data", json).apply()
     }
 
     fun loadAppBlockerCooldownData(): MutableMap<String, Long> {
@@ -50,7 +53,7 @@ class SavedPreferencesLoader(private val context: Context) {
         val sharedPreferences =
             context.getSharedPreferences("view_blocker", Context.MODE_PRIVATE)
         val json = Gson().toJson(cooldowns)
-        sharedPreferences.edit().putString("cooldown_data", json).commit()
+        sharedPreferences.edit().putString("cooldown_data", json).apply()
     }
 
     fun loadViewBlockerCooldownData(): MutableMap<String, Long> {
@@ -61,6 +64,99 @@ class SavedPreferencesLoader(private val context: Context) {
 
         val type = object : TypeToken<MutableMap<String, Long>>() {}.type
         return Gson().fromJson(json, type)
+    }
+
+    fun saveReelBlockerCooldownData(cooldowns: Map<String, Long>) {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        val json = Gson().toJson(cooldowns)
+        sharedPreferences.edit().putString("cooldown_data", json).apply()
+    }
+
+    fun loadReelBlockerCooldownData(): MutableMap<String, Long> {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        val json = sharedPreferences.getString("cooldown_data", null)
+        if (json.isNullOrEmpty()) return mutableMapOf()
+
+        val type = object : TypeToken<MutableMap<String, Long>>() {}.type
+        return Gson().fromJson(json, type)
+    }
+
+    fun isReelBlockerEnabled(defaultValue: Boolean = false): Boolean {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean("is_enabled", defaultValue)
+    }
+
+    fun setReelBlockerEnabled(enabled: Boolean) {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("is_enabled", enabled).apply()
+    }
+
+    fun getReelBlockerMode(defaultMode: Int = ReelBlocker.MODE_BLOCK_ALL): Int {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        return sharedPreferences.getInt("mode_type", defaultMode)
+    }
+
+    fun setReelBlockerMode(mode: Int) {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putInt("mode_type", mode).apply()
+    }
+
+    fun getReelBlockerDailyLimit(defaultLimit: Int = 200): Int {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        return sharedPreferences.getInt("daily_limit", defaultLimit)
+    }
+
+    fun setReelBlockerDailyLimit(limit: Int) {
+        val sharedPreferences =
+            context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putInt("daily_limit", limit).apply()
+    }
+
+    // -- Reel Blocker per-platform / browser toggles ---------------------------
+    // Each toggle defaults to `true` for native platforms and `false` for browsers
+    // so existing users keep current behavior, and the browser feature stays opt-in.
+
+    fun isReelBlockerYoutubeEnabled(default: Boolean = true): Boolean =
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .getBoolean("is_youtube_enabled", default)
+
+    fun setReelBlockerYoutubeEnabled(enabled: Boolean) {
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .edit().putBoolean("is_youtube_enabled", enabled).apply()
+    }
+
+    fun isReelBlockerInstagramEnabled(default: Boolean = true): Boolean =
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .getBoolean("is_instagram_enabled", default)
+
+    fun setReelBlockerInstagramEnabled(enabled: Boolean) {
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .edit().putBoolean("is_instagram_enabled", enabled).apply()
+    }
+
+    fun isReelBlockerTiktokEnabled(default: Boolean = true): Boolean =
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .getBoolean("is_tiktok_enabled", default)
+
+    fun setReelBlockerTiktokEnabled(enabled: Boolean) {
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .edit().putBoolean("is_tiktok_enabled", enabled).apply()
+    }
+
+    fun isReelBlockerBrowserEnabled(default: Boolean = false): Boolean =
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .getBoolean("is_browser_enabled", default)
+
+    fun setReelBlockerBrowserEnabled(enabled: Boolean) {
+        context.getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+            .edit().putBoolean("is_browser_enabled", enabled).apply()
     }
 
     fun loadBlockedKeywords(): Set<String> {
@@ -461,6 +557,46 @@ class SavedPreferencesLoader(private val context: Context) {
 
     fun clearCompassionateAccessGrant() {
         getCompassionateAccessPrefs().edit().clear().commit()
+    }
+
+    private fun getHomePrefs(): android.content.SharedPreferences {
+        return context.getSharedPreferences("home_dashboard", Context.MODE_PRIVATE)
+    }
+
+    fun isHomeWelcomeCardVisible(): Boolean {
+        return getHomePrefs().getBoolean("show_welcome_card", true)
+    }
+
+    fun setHomeWelcomeCardVisible(visible: Boolean) {
+        getHomePrefs().edit().putBoolean("show_welcome_card", visible).apply()
+    }
+
+    private fun getFeatureTogglesPrefs(): android.content.SharedPreferences {
+        return context.getSharedPreferences("feature_toggles", Context.MODE_PRIVATE)
+    }
+
+    fun isAppBlockerFeatureEnabled(default: Boolean = true): Boolean {
+        return getFeatureTogglesPrefs().getBoolean("app_blocker_enabled", default)
+    }
+
+    fun setAppBlockerFeatureEnabled(enabled: Boolean) {
+        getFeatureTogglesPrefs().edit().putBoolean("app_blocker_enabled", enabled).apply()
+    }
+
+    fun isKeywordBlockerFeatureEnabled(default: Boolean = true): Boolean {
+        return getFeatureTogglesPrefs().getBoolean("keyword_blocker_enabled", default)
+    }
+
+    fun setKeywordBlockerFeatureEnabled(enabled: Boolean) {
+        getFeatureTogglesPrefs().edit().putBoolean("keyword_blocker_enabled", enabled).apply()
+    }
+
+    fun isUsageTrackerFeatureEnabled(default: Boolean = true): Boolean {
+        return getFeatureTogglesPrefs().getBoolean("usage_tracker_enabled", default)
+    }
+
+    fun setUsageTrackerFeatureEnabled(enabled: Boolean) {
+        getFeatureTogglesPrefs().edit().putBoolean("usage_tracker_enabled", enabled).apply()
     }
 
 }

@@ -28,7 +28,19 @@ This is the most sensitive category of data, and we want to be exceptionally cle
     *   **Keyword Blocker:** The Accessibility Service analyzes text appearing on your screen in real-time to identify and block keywords that you have defined.
     *   **Smart Blur / Smart Content Moderation (Premium Feature):** For this feature, the Accessibility Service analyzes on-screen text and images. This content is passed to an on-device machine learning model (TensorFlow Lite) to detect potentially inappropriate content (e.g., nudity, suggestive content).
     *   **Crucially, all this analysis happens locally.** The text, images, and videos from other apps never leave your device.
-*   **Crash Logs:** The application generates logs if it crashes. These logs contain information about the error but do not contain personal identifiers. We only have access to this information if you **explicitly choose** to share it with us via the "Share Crash Log" feature.
+*   **Crash Logs and Error Reports:** The application generates logs when it crashes or encounters errors. These logs contain:
+    *   Device information (manufacturer, model, Android version)
+    *   App version and error details
+    *   System memory usage
+    *   Stack trace information
+    *   **No sensitive data:** No app content, keywords, or personal information are included in crash logs.
+    *   These logs are stored **locally on your device only**.
+    *   We only have access to this information if you **explicitly choose** to share it with us via the "Export Report" feature.
+*   **User Feedback:** When you submit optional feedback after a crash, you can include:
+    *   Your description of what happened
+    *   Your email address (optional, for follow-up)
+    *   App rating (1-5 stars)
+    *   This data is stored **locally on your device only** until you explicitly share it.
 
 ## 3. Justification for Permissions
 
@@ -85,26 +97,50 @@ You have full control over your data. You can delete your data in two ways:
 1.  **Clearing App Data:** You can go to your device's Settings -> Apps -> DeenShield -> Storage and tap "Clear Data." This will permanently delete all data associated with the app.
 2.  **Uninstalling the App:** Uninstalling the DeenShield application will remove the app and all of its associated data from your device.
 
-## 8. Your Rights and Choices
+## 8. Error Reporting and Feedback Control
+
+We give you complete control over error reporting and feedback:
+
+**By Default:**
+*   Crash logs and error reports are **stored locally on your device only**
+*   We never automatically send them to our servers
+*   We never share them with third parties without your permission
+
+**Your Choices:**
+*   **Enable/Disable Crash Reporting:** Toggle in Settings → Error Reporting
+*   **Enable/Disable Feedback Collection:** Toggle in Settings → Error Reporting
+*   **View Your Data:** See exactly what's stored locally in Settings → Error Reporting
+*   **Export Your Data:** Share crash logs and feedback via email or other apps (one tap)
+*   **Delete Your Data:** Permanently delete all error logs and feedback with one tap
+
+**When You Choose to Share:**
+*   You can export all error data as a single text file
+*   You choose which app to use (email, cloud storage, messaging, etc.)
+*   The report includes crash logs, diagnostics, and any feedback you submitted
+*   You can manually add or modify recipient addresses before sending
+*   Our support team emails (support@alhaq-initiative.org and alhaq.dst@gmail.com) are pre-filled as CC recipients for convenience
+
+## 9. Your Rights and Choices
 
 You have the following rights regarding your information:
 *   **Access and Modify:** You can access and modify your configuration data at any time within the app's settings.
+*   **Access Error Data:** View all crash logs and feedback stored on your device anytime
 *   **Disable Permissions:** You can disable the Accessibility Service or other permissions for DeenShield at any time through your device's settings. Please note that doing so will cause the core features of the app to stop working.
 *   **Opt-out of Account Sync:** You can use the app without signing into a Google account, though premium features may require it.
 
-## 9. Security
+## 10. Security
 
 We take reasonable measures to protect the information stored locally on your device. The app is built on standard Android platform security features. However, no method of electronic storage is 100% secure, especially as the data resides on your personal device, the security of which is outside our control.
 
-## 10. Children's Privacy
+## 11. Children's Privacy
 
 DeenShield is not intended for use by children under the age of 13 (or the relevant age in your jurisdiction). We do not knowingly collect personal information from children.
 
-## 11. Changes to This Privacy Policy
+## 12. Changes to This Privacy Policy
 
 We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy within the app and updating the "Last Updated" date. You are advised to review this Privacy Policy periodically for any changes.
 
-## 12. Contact Us
+## 13. Contact Us
 
 If you have any questions or concerns about this Privacy Policy, please contact us at:
 **contact@alhaq-initiative.org**

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cloud / device-to-device backup rules for DeenShield.
+
+    Sensitive prefs are excluded so that the anti-uninstall password,
+    premium status, compassionate access grants, and protected-app
+    lists are never copied off-device via Auto Backup or Google One
+    backups. This also prevents a restored backup from carrying over
+    a user's bypass cooldown state to a new device.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="anti_uninstall.xml" />
+    <exclude domain="sharedpref" path="premium_status.xml" />
+    <exclude domain="sharedpref" path="compassionate_access.xml" />
+    <exclude domain="sharedpref" path="app_guard.xml" />
+    <exclude domain="sharedpref" path="smart_features.xml" />
+    <exclude domain="sharedpref" path="app_blocker.xml" />
+    <exclude domain="sharedpref" path="view_blocker.xml" />
+    <exclude domain="sharedpref" path="reel_blocker.xml" />
+    <exclude domain="sharedpref" path="focus_mode.xml" />
+</full-backup-content>

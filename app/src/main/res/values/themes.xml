@@ -57,22 +57,69 @@
     <style name="Theme.DeenShield" parent="Base.Theme.DeenShield" />
 
     <!-- Modern Gradient Theme -->
+    <!-- Pass 1 readability tune-up: full M3 token coverage so dialogs, sheets,
+         chips, text fields, and icons all pick up legible colors on top of the
+         deep indigo/purple gradient instead of falling back to default light
+         tones. Surfaces are translucent dark layers (not fully transparent) so
+         text always has a contrast cushion above the gradient. -->
     <style name="Theme.DeenShield.Gradient" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/gradient_background</item>
+
+        <!-- Primary / Secondary / Tertiary -->
         <item name="colorPrimary">@color/gradient_primary</item>
         <item name="colorOnPrimary">@color/gradient_onPrimary</item>
         <item name="colorPrimaryContainer">@color/gradient_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/gradient_onPrimaryContainer</item>
         <item name="colorSecondary">@color/gradient_secondary</item>
         <item name="colorOnSecondary">@color/gradient_onSecondary</item>
-        <item name="colorSurface">@android:color/transparent</item> <!-- Transparent to show gradient -->
+        <item name="colorSecondaryContainer">@color/gradient_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/gradient_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/gradient_tertiary</item>
+        <item name="colorOnTertiary">@color/gradient_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/gradient_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/gradient_onTertiaryContainer</item>
+
+        <!-- Error -->
+        <item name="colorError">@color/gradient_error</item>
+        <item name="colorOnError">@color/gradient_onError</item>
+        <item name="colorErrorContainer">@color/gradient_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/gradient_onErrorContainer</item>
+
+        <!-- Background / Surface -->
+        <item name="android:colorBackground">@color/gradient_background</item>
+        <item name="colorOnBackground">@color/gradient_onBackground</item>
+        <!-- Use a translucent dark surface instead of fully transparent: cards,
+             dialogs, and bottom sheets need a contrast cushion to stay readable
+             on top of the gradient. Components that should reveal the gradient
+             explicitly use windowBackground or null background. -->
+        <item name="colorSurface">#CC1A1233</item>
         <item name="colorOnSurface">@color/gradient_onSurface</item>
         <item name="colorSurfaceVariant">@color/gradient_surfaceVariant</item>
         <item name="colorOnSurfaceVariant">@color/gradient_onSurfaceVariant</item>
-        <!-- Ensure cards and other surfaces are semi-transparent or dark -->
-        <item name="colorSurfaceContainer">#80121212</item>
-        <item name="colorSurfaceContainerHigh">#992D2D2D</item>
-        
+        <item name="colorOutline">@color/gradient_outline</item>
+        <item name="colorOutlineVariant">@color/gradient_outlineVariant</item>
+
+        <!-- Surface container ramps used by cards, navigation, dialogs. -->
+        <item name="colorSurfaceContainerLowest">@color/gradient_surfaceContainerLowest</item>
+        <item name="colorSurfaceContainerLow">@color/gradient_surfaceContainerLow</item>
+        <item name="colorSurfaceContainer">@color/gradient_surfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">@color/gradient_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerHighest">@color/gradient_surfaceContainerHighest</item>
+
+        <!-- Inverse tokens: drive Snackbar background, undo action color, and
+             any component that flips contrast against a dark surface. Without
+             these, Snackbars fall back to the default light theme and become
+             unreadable on top of our gradient. -->
+        <item name="colorSurfaceInverse">#F2EEFF</item>
+        <item name="colorOnSurfaceInverse">#1A0B5C</item>
+        <item name="colorPrimaryInverse">@color/gradient_primaryContainer</item>
+
+        <!-- System bars: edge-to-edge, light icons over dark gradient. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
         <!-- Button Styles -->
         <item name="materialButtonStyle">@style/Widget.DeenShield.Button</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.DeenShield.Button.Outlined</item>

@@ -11,6 +11,7 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import com.alhaq.deenshield.R
 import com.alhaq.deenshield.databinding.ActivityRemindersBinding
 import com.alhaq.deenshield.utils.NotificationHelper
@@ -75,6 +76,11 @@ class RemindersActivity : AppCompatActivity() {
     private fun setupListeners() {
         // Daily report switch
         binding.dailyReportSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !ensureNotificationsEnabled()) {
+                binding.dailyReportSwitch.isChecked = false
+                return@setOnCheckedChangeListener
+            }
+
             sharedPreferences.edit().putBoolean(PREF_DAILY_REPORT_ENABLED, isChecked).apply()
             binding.reportTimeContainer.visibility = if (isChecked) View.VISIBLE else View.GONE
             
@@ -92,6 +98,11 @@ class RemindersActivity : AppCompatActivity() {
         
         // Focus reminder switch
         binding.focusReminderSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !ensureNotificationsEnabled()) {
+                binding.focusReminderSwitch.isChecked = false
+                return@setOnCheckedChangeListener
+            }
+
             sharedPreferences.edit().putBoolean(PREF_FOCUS_REMINDER_ENABLED, isChecked).apply()
             if (isChecked) {
                 Toast.makeText(this, "Focus reminders will appear when you're using distracting apps", Toast.LENGTH_SHORT).show()
@@ -100,13 +111,39 @@ class RemindersActivity : AppCompatActivity() {
         
         // Achievement switch
         binding.achievementSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !ensureNotificationsEnabled()) {
+                binding.achievementSwitch.isChecked = false
+                return@setOnCheckedChangeListener
+            }
+
             sharedPreferences.edit().putBoolean(PREF_ACHIEVEMENT_ENABLED, isChecked).apply()
         }
         
         // Test notification button
         binding.testNotificationButton.setOnClickListener {
+            if (!ensureNotificationsEnabled()) {
+                return@setOnClickListener
+            }
             testNotification()
         }
+    }
+
+    private fun ensureNotificationsEnabled(): Boolean {
+        val enabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
+        if (enabled) return true
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.notification_permission_title)
+            .setMessage(R.string.notification_permission_required)
+            .setPositiveButton(R.string.open_settings) { _, _ ->
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+        return false
     }
     
     private fun showTimePicker() {

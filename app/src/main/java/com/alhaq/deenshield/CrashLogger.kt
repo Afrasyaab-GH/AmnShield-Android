@@ -1,49 +1,35 @@
 package com.alhaq.deenshield
 
 import android.content.Context
-import android.os.Build
-import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import android.util.Log
+import com.alhaq.deenshield.utils.ErrorReportManager
 
+/**
+ * Global uncaught exception handler that logs crashes using ErrorReportManager.
+ * Catches all uncaught exceptions and ensures they are logged before system handles it.
+ */
 class CrashLogger(private val context: Context) : Thread.UncaughtExceptionHandler {
 
-    private val logFile = File(context.filesDir, "crash_log.txt")
+    private val errorManager = ErrorReportManager.getInstance(context)
     private val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
 
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
         try {
-            val timeStamp =
-                SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-            val writer = FileWriter(logFile, true) // Append mode
-            writer.append("\n--- Crash at $timeStamp ---\n")
-            writer.append("Device: ${Build.MANUFACTURER} ${Build.MODEL} (Android ${Build.VERSION.RELEASE})\n")
-            val printWriter = PrintWriter(writer)
-            throwable.printStackTrace(printWriter)
-            printWriter.flush()
-            printWriter.close()
+            errorManager.logCrash(thread, throwable)
+            Log.e("CrashLogger", "Uncaught exception logged", throwable)
         } catch (e: Exception) {
-            e.printStackTrace()
+            // Last resort: ensure logging doesn't prevent crash handling
+            Log.e("CrashLogger", "Failed to log crash", e)
         }
 
-        defaultHandler?.uncaughtException(thread, throwable) // Let the system handle the crash
+        // Allow the system to process the crash
+        defaultHandler?.uncaughtException(thread, throwable)
     }
 
-    fun logNonFatalError(exception: Exception) {
-        try {
-            val timeStamp =
-                SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-            val writer = FileWriter(logFile, true) // Append mode
-            writer.append("\n--- Non-Fatal Error (Caught) at $timeStamp ---\n")
-            val printWriter = PrintWriter(writer)
-            exception.printStackTrace(printWriter)
-            printWriter.flush()
-            printWriter.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    /**
+     * Log a non-fatal error that was caught and handled
+     */
+    fun logNonFatalError(tag: String, message: String, exception: Exception? = null) {
+        errorManager.logNonFatalError(tag, message, exception)
     }
 }

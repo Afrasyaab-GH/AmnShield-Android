@@ -5,7 +5,7 @@
     <item
         android:id="@+id/action_notifications"
         android:icon="@drawable/ic_deenshield_notification"
-        android:title="@string/reminders"
+        android:title="@string/notifications"
         app:showAsAction="always" />
     
     <item

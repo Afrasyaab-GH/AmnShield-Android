@@ -31,7 +31,7 @@ class FragmentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_fragment)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, windowInsets ->
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             WindowInsetsCompat.CONSUMED
         }
 
@@ -43,7 +43,9 @@ class FragmentActivity : AppCompatActivity() {
             fragment = when (featureType) {
                 "focus_mode" -> com.alhaq.deenshield.ui.fragments.features.FocusModeConfigFragment()
                 "app_blocker" -> com.alhaq.deenshield.ui.fragments.features.AppBlockerConfigFragment()
-                "view_blocker" -> com.alhaq.deenshield.ui.fragments.features.ViewBlockerConfigFragment()
+                // "view_blocker" was consolidated into Reel Blocker; route removed to
+                // avoid resurrecting the deprecated config screen via legacy intents.
+                "reel_blocker" -> com.alhaq.deenshield.ui.fragments.features.ReelBlockerConfigFragment()
                 "usage_tracker" -> com.alhaq.deenshield.ui.fragments.features.UsageTrackerConfigFragment()
                 "keyword_blocker" -> com.alhaq.deenshield.ui.fragments.features.KeywordBlockerConfigFragment()
                 "anti_uninstall" -> ChooseModeFragment()

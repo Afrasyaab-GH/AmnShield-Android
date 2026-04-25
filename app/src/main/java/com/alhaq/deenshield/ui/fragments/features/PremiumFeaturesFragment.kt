@@ -18,6 +18,8 @@ import com.alhaq.deenshield.premium.PremiumProducts
 import com.alhaq.deenshield.utils.BillingClientWrapper
 import com.alhaq.deenshield.utils.SavedPreferencesLoader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.text.DateFormat
+import java.util.Date
 
 class PremiumFeaturesFragment : Fragment() {
 
@@ -72,6 +74,9 @@ class PremiumFeaturesFragment : Fragment() {
         binding.btnCompassionateAccess.setOnClickListener {
             showCompassionateAccessDialog()
         }
+        binding.btnSpecialAccess.setOnClickListener {
+            showSpecialAccessDialog()
+        }
     }
 
     private fun launchPurchase(productId: String) {
@@ -109,19 +114,38 @@ class PremiumFeaturesFragment : Fragment() {
                 updatePremiumState()
                 Toast.makeText(requireContext(), R.string.premium_purchase_success, Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(requireContext(), "No previous purchases found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.premium_no_previous_purchases, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun updatePremiumState() {
-        val isPremium = premiumManager.isPremium()
+        val userType = premiumManager.getUserType()
+        val isPremium = userType != PremiumManager.UserType.FREE
         binding.premiumActiveContainer.visibility = if (isPremium) View.VISIBLE else View.GONE
         binding.premiumUpsellContainer.visibility = if (isPremium) View.GONE else View.VISIBLE
         binding.btnBuyLifetime.isEnabled = !isPremium
         binding.btnBuyMonthly.isEnabled = !isPremium
         binding.btnBuyYearly.isEnabled = !isPremium
         binding.btnRestore.visibility = if (isPremium) View.GONE else View.VISIBLE
+
+        val activeMessage = when (userType) {
+            PremiumManager.UserType.PREMIUM -> getString(R.string.premium_active_message)
+            PremiumManager.UserType.SPECIAL -> getString(R.string.special_access_active_description)
+            PremiumManager.UserType.COMPASSIONATE -> {
+                val expiry = preferencesLoader.getCompassionateAccessExpiry()
+                if (expiry > 0L) {
+                    getString(
+                        R.string.compassionate_access_active_until,
+                        DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(expiry))
+                    )
+                } else {
+                    getString(R.string.compassionate_access_active_description)
+                }
+            }
+            PremiumManager.UserType.FREE -> getString(R.string.premium_active_message)
+        }
+        binding.txtPremiumActiveMessage.text = activeMessage
     }
 
     private fun updateProductDetails() {
@@ -235,5 +259,28 @@ class PremiumFeaturesFragment : Fragment() {
                 Toast.LENGTH_LONG
             ).show()
         }
+    }
+
+    private fun showSpecialAccessDialog() {
+        val input = EditText(requireContext()).apply {
+            hint = getString(R.string.special_access_hint)
+            inputType = InputType.TYPE_CLASS_TEXT
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.special_access_title)
+            .setMessage(getString(R.string.special_access_message))
+            .setView(input)
+            .setPositiveButton(R.string.special_access_activate) { _, _ ->
+                val accessId = input.text?.toString().orEmpty()
+                if (premiumManager.setSpecialAccessId(accessId)) {
+                    updatePremiumState()
+                    Toast.makeText(requireContext(), R.string.special_access_success, Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(requireContext(), R.string.special_access_invalid, Toast.LENGTH_LONG).show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 }

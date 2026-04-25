@@ -39,7 +39,7 @@ class LauncherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply theme before super.onCreate
-        val sharedPreferences = getSharedPreferences("com.alhaq.deenshield_preferences", MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("theme_prefs", MODE_PRIVATE)
         val themeStyle = sharedPreferences.getString("theme_style", "default")
         if (themeStyle == "gradient") {
             setTheme(R.style.Theme_DeenShield_Gradient)
@@ -59,7 +59,16 @@ class LauncherActivity : AppCompatActivity() {
             addAction(Intent.ACTION_PACKAGE_REMOVED)
             addDataScheme("package") // Important for detecting package changes
         }
-        registerReceiver(packageChangeReceiver, packageChangeIntentFilter)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                packageChangeReceiver,
+                packageChangeIntentFilter,
+                Context.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
+            registerReceiver(packageChangeReceiver, packageChangeIntentFilter)
+        }
 
         pinnedAppPackages.addAll(loadPinnedApps())
         adapter = ApplicationAdapter(listOf())

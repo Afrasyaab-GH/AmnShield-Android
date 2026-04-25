@@ -100,16 +100,40 @@
         <color name="md_theme_onPrimaryContainer_highContrast">#FFFFFF</color>
 
     <!-- Modern Gradient Theme Colors -->
-    <color name="gradient_primary">#7C4DFF</color>
-    <color name="gradient_onPrimary">#FFFFFF</color>
-    <color name="gradient_primaryContainer">#651FFF</color>
+    <!-- Vibrant accents tuned for legibility on a deep indigo/purple background. -->
+    <color name="gradient_primary">#B39DFF</color>          <!-- soft lavender, accessible on dark gradient -->
+    <color name="gradient_onPrimary">#1A0B5C</color>
+    <color name="gradient_primaryContainer">#5A3FE0</color>  <!-- toned down from #651FFF for less buzz -->
     <color name="gradient_onPrimaryContainer">#FFFFFF</color>
-    <color name="gradient_secondary">#00B0FF</color>
-    <color name="gradient_onSecondary">#FFFFFF</color>
-    <color name="gradient_surface">#121212</color> <!-- Dark surface for gradient theme -->
-    <color name="gradient_onSurface">#FFFFFF</color>
-    <color name="gradient_surfaceVariant">#2D2D2D</color>
-    <color name="gradient_onSurfaceVariant">#B3B3B3</color>
+    <color name="gradient_secondary">#7FDBFF</color>        <!-- lighter cyan, was #00B0FF (too saturated for text) -->
+    <color name="gradient_onSecondary">#00344A</color>
+    <color name="gradient_secondaryContainer">#0F4A66</color>
+    <color name="gradient_onSecondaryContainer">#D4F1FF</color>
+    <color name="gradient_tertiary">#FFB4D9</color>
+    <color name="gradient_onTertiary">#5C0036</color>
+    <color name="gradient_tertiaryContainer">#7A2A55</color>
+    <color name="gradient_onTertiaryContainer">#FFE0EE</color>
+    <color name="gradient_error">#FFB4AB</color>
+    <color name="gradient_onError">#690005</color>
+    <color name="gradient_errorContainer">#93000A</color>
+    <color name="gradient_onErrorContainer">#FFDAD6</color>
+    <color name="gradient_background">#1A1233</color>        <!-- fallback solid for off-window surfaces -->
+    <color name="gradient_onBackground">#ECE6FF</color>
+    <color name="gradient_surface">#1A1233</color>
+    <color name="gradient_onSurface">#F2EEFF</color>          <!-- was #FFFFFF; slight off-white reduces glare -->
+    <color name="gradient_surfaceVariant">#3A2E5C</color>
+    <color name="gradient_onSurfaceVariant">#D8D2F0</color>   <!-- was #B3B3B3, too dim against gradient -->
+    <color name="gradient_outline">#9A8DC0</color>
+    <color name="gradient_outlineVariant">#4D4170</color>
+    <!-- Translucent surface layers stacked above the gradient window background.
+         Alpha ramps from ~50% (lowest) to ~90% (highest) so the gradient still
+         peeks through subtle layers (chips, ripples) while primary cards and
+         dialogs stay opaque enough for WCAG-AA body text. ARGB hex (#AARRGGBB). -->
+    <color name="gradient_surfaceContainerLowest">#80120E26</color>
+    <color name="gradient_surfaceContainerLow">#99140F2C</color>
+    <color name="gradient_surfaceContainer">#CC1A1233</color>
+    <color name="gradient_surfaceContainerHigh">#D9221545</color>
+    <color name="gradient_surfaceContainerHighest">#E62A1B58</color>
     <color name="md_theme_secondary_highContrast">#0D2622</color>
     <color name="md_theme_onSecondary_highContrast">#FFFFFF</color>
     <color name="md_theme_secondaryContainer_highContrast">#2F4742</color>

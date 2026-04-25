@@ -123,6 +123,7 @@ class TweakViewBlockerWarning(
 
                 // Send broadcast to refresh ViewBlockerService
                 sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER)
+                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
                 dialog.dismiss()
             }
             .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->

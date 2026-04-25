@@ -64,6 +64,8 @@ class SetupTimedModeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val defaultBlockChanges = arguments?.getBoolean(ChooseModeFragment.ARG_BLOCK_CHANGES_DEFAULT, false) == true
+        binding.blockChanges.isChecked = defaultBlockChanges
         binding.calendarView.minDate = binding.calendarView.date
         
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -162,6 +164,7 @@ class SetupTimedModeFragment : Fragment() {
         }
 
         val intent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_ANTI_UNINSTALL)
+            .setPackage(activity?.packageName)
         activity?.sendBroadcast(intent)
 
         activity?.finish()

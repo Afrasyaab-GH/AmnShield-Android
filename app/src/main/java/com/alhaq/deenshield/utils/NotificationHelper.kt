@@ -12,11 +12,20 @@ import com.alhaq.deenshield.R
 import com.alhaq.deenshield.ui.activity.MainActivity
 import com.alhaq.deenshield.ui.activity.ReportsActivity
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 /**
  * Manages notifications for daily reports, reminders, and achievements
  */
 class NotificationHelper(private val context: Context) {
+
+    private val reminderPrefs by lazy {
+        context.getSharedPreferences("reminder_settings", Context.MODE_PRIVATE)
+    }
+
+    private val achievementPrefs by lazy {
+        context.getSharedPreferences("achievement_notifications", Context.MODE_PRIVATE)
+    }
 
     companion object {
         private const val CHANNEL_ID_REPORTS = "daily_reports"
@@ -91,8 +100,11 @@ class NotificationHelper(private val context: Context) {
      * Show daily report notification
      */
     fun showDailyReportNotification(date: LocalDate = LocalDate.now()) {
+        if (!reminderPrefs.getBoolean("daily_report_enabled", false)) return
+
         val reportGenerator = ReportGenerator(context)
         val summaryText = reportGenerator.generateDailySummaryText(date)
+        val shortDate = date.format(DateTimeFormatter.ofPattern("MMM d"))
         
         val intent = Intent(context, ReportsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -107,8 +119,8 @@ class NotificationHelper(private val context: Context) {
         
         val notification = NotificationCompat.Builder(context, CHANNEL_ID_REPORTS)
             .setSmallIcon(R.drawable.ic_logo_mini)
-            .setContentTitle("📊 Your Daily DeenShield Report")
-            .setContentText("View your productivity and blocking stats")
+            .setContentTitle("Daily DeenShield Report • $shortDate")
+            .setContentText("Tap to review your blocking, focus, and reels summary")
             .setStyle(NotificationCompat.BigTextStyle().bigText(summaryText))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
@@ -118,6 +130,12 @@ class NotificationHelper(private val context: Context) {
         with(NotificationManagerCompat.from(context)) {
             try {
                 notify(NOTIFICATION_ID_DAILY_REPORT, notification)
+                NotificationInboxStore.add(
+                    context,
+                    title = "Daily DeenShield Report • $shortDate",
+                    message = "Tap to review your blocking, focus, and reels summary",
+                    category = NotificationInboxStore.Category.DAILY_REPORT
+                )
             } catch (e: SecurityException) {
                 // User has not granted notification permission
             }
@@ -128,6 +146,8 @@ class NotificationHelper(private val context: Context) {
      * Show focus reminder notification
      */
     fun showFocusReminder(title: String, message: String) {
+        if (!reminderPrefs.getBoolean("focus_reminder_enabled", false)) return
+
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -153,6 +173,12 @@ class NotificationHelper(private val context: Context) {
         with(NotificationManagerCompat.from(context)) {
             try {
                 notify(NOTIFICATION_ID_REMINDER, notification)
+                NotificationInboxStore.add(
+                    context,
+                    title = title,
+                    message = message,
+                    category = NotificationInboxStore.Category.REMINDER
+                )
             } catch (e: SecurityException) {
                 // User has not granted notification permission
             }
@@ -163,6 +189,12 @@ class NotificationHelper(private val context: Context) {
      * Show achievement notification
      */
     fun showAchievementNotification(achievement: String, description: String) {
+        if (!reminderPrefs.getBoolean("achievement_enabled", true)) return
+
+        val todayKey = LocalDate.now().toString()
+        val notificationKey = "${achievement.lowercase()}_$todayKey"
+        if (achievementPrefs.getBoolean(notificationKey, false)) return
+
         val intent = Intent(context, ReportsActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -187,6 +219,13 @@ class NotificationHelper(private val context: Context) {
         with(NotificationManagerCompat.from(context)) {
             try {
                 notify(NOTIFICATION_ID_ACHIEVEMENT, notification)
+                achievementPrefs.edit().putBoolean(notificationKey, true).apply()
+                NotificationInboxStore.add(
+                    context,
+                    title = "🎉 $achievement",
+                    message = description,
+                    category = NotificationInboxStore.Category.ACHIEVEMENT
+                )
             } catch (e: SecurityException) {
                 // User has not granted notification permission
             }

@@ -134,9 +134,9 @@ class FocusModeBlocker : BaseBlocker() {
             packageNames.forEach { packageName ->
 
                 if (autoFocusHours.containsKey(packageName)) {
-                    val cheatHourTimeData: List<Pair<Int, Int>>? = autoFocusHours[packageName]
+                    val cheatHourTimeData = autoFocusHours[packageName].orEmpty()
                     val cheatHourNewTimeData: MutableList<Pair<Int, Int>> =
-                        cheatHourTimeData!!.toMutableList()
+                        cheatHourTimeData.toMutableList()
 
                     cheatHourNewTimeData.add(Pair(startTime, endTime))
                     autoFocusHours[packageName] = cheatHourNewTimeData

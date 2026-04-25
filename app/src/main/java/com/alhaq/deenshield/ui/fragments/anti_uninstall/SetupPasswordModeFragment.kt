@@ -64,6 +64,9 @@ class SetupPasswordModeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val defaultBlockChanges = arguments?.getBoolean(ChooseModeFragment.ARG_BLOCK_CHANGES_DEFAULT, false) == true
+        binding.cbBlockChanges.isChecked = defaultBlockChanges
+
         binding.btnNextPass.setOnClickListener {
             // Validate password first
             val password = binding.password.text.toString()
@@ -151,17 +154,23 @@ class SetupPasswordModeFragment : Fragment() {
     }
 
     private fun setupPasswordMode() {
+        // Store the password as a salted SHA-256 hash via PasswordHasher (v2 format).
+        // The raw password never touches disk; rooted/backup inspection cannot recover it.
+        val hashed = com.alhaq.deenshield.utils.PasswordHasher.hash(
+            binding.password.text.toString()
+        )
         val editor =
             activity?.getSharedPreferences("anti_uninstall", Context.MODE_PRIVATE)?.edit()
         editor?.apply() {
             putBoolean("is_anti_uninstall_on", true)
-            putString("password", binding.password.text.toString())
+            putString("password", hashed)
             putInt("mode", Constants.ANTI_UNINSTALL_PASSWORD_MODE)
             putBoolean("is_configuring_blocked", binding.cbBlockChanges.isChecked)
             commit()
         }
 
         val intent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_ANTI_UNINSTALL)
+            .setPackage(activity?.packageName)
         activity?.sendBroadcast(intent)
 
         activity?.finish()

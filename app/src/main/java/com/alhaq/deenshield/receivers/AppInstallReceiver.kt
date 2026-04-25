@@ -51,8 +51,9 @@ class AppInstallReceiver : BroadcastReceiver() {
             currentBlockedApps.add(packageName)
             prefsLoader.saveBlockedApps(currentBlockedApps)
             
-            // Refresh the accessibility service
+            // Refresh the accessibility service (scoped to our package only)
             val refreshIntent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                .setPackage(context.packageName)
             context.sendBroadcast(refreshIntent)
             
             Log.i("AppInstallReceiver", "Auto-blocked newly installed app: $packageName (category: $appCategory)")

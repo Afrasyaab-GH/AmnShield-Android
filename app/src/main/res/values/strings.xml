@@ -4,9 +4,9 @@
     <string name="launcher_options">Launcher Options</string>
     <string name="focus_mode">Focus Mode</string>
     <string name="app_blocker">App Blocker</string>
-    <string name="view_reel_blocker">View/Reel Blocker</string>
+    <string name="view_reel_blocker">Reels/Shorts Blocker</string>
     <string name="keyword_blocker">Keyword Blocker</string>
-    <string name="anti_uninstall">Anti Uninstall</string>
+    <string name="anti_uninstall">App Protection</string>
     <string name="usage_tracker">Usage Tracker</string>
     <string name="disabled">Disabled</string>
     <string name="select_pinned_apps">Select pinned apps</string>
@@ -15,9 +15,12 @@
     <string name="start_focus_mode">Start focus mode</string>
     <string name="warning_general_settings">Enable General Accessibility Service to access this option</string>
     <string name="manage_warning_screen">Manage Warning Screen</string>
+    <string name="enable_app_blocker">Enable App Blocker</string>
+    <string name="enable_keyword_blocker">Enable Keyword Blocker</string>
+    <string name="enable_usage_tracker">Enable Usage Tracker</string>
     <string name="manage_cheat_hours">Manage Cheat Hours</string>
     <string name="warning_app_blocker_settings">Enable App Blocker Accessibility Service to manage app blocking</string>
-    <string name="warning_view_blocker_settings">Enable View Blocker Accessibility Service to manage view blocking</string>
+    <string name="warning_view_blocker_settings">Enable Shorts Blocker Accessibility Service to manage shorts blocking</string>
     <string name="add_custom_keywords">Add Custom Keywords</string>
     <string name="manage_keyword_packs">Manage Keyword Packs</string>
     <string name="warning_keywords_settings">Enable Keyword Blocker Accessibility Service to manage blocked keywords</string>
@@ -26,7 +29,7 @@
     <string name="usage_stats">Usage Stats</string>
     <string name="manage_overlay_trackers">Manage Real Time Overlay</string>
     <string name="warning_usage_tracker_settings">Enable Usage Tracker Accessibility Service to manage trackers</string>
-    <string name="remove_anti_uninstall">Remove Anti-Uninstall</string>
+    <string name="remove_anti_uninstall">Disable App Protection</string>
     <string name="add_cheat_hours">Add Cheat Hours</string>
     <string name="add">Add</string>
     <string name="save">Save</string>
@@ -72,12 +75,12 @@
     <string name="timed_mode">Timed Mode</string>
     <string name="block_all_uninstall_attempts_for_a_set_amount_of_days">Block all uninstall attempts for a specified number of days.</string>
     <string name="password_mode">Password Mode</string>
-    <string name="block_all_uninstall_attempts_until_you_remove_anti_uninstall_with_a_password">Block all uninstall attempts until the anti-uninstall protection is removed with a password</string>
+    <string name="block_all_uninstall_attempts_until_you_remove_anti_uninstall_with_a_password">Block uninstall attempts until App Protection is removed with a password</string>
     <string name="next">Next</string>
     <string name="password_mode_desc">Make sure not to forget this password. You may not be able to exit anti-uninstall without it.</string>
     <string name="turn_on">Turn On</string>
     <string name="timed_mode_desc">How long would you like to keep anti-uninstall enabled?</string>
-    <string name="turn_on_anti_uninstall">Turn on Anti Uninstall</string>
+    <string name="turn_on_anti_uninstall">Turn on App Protection</string>
     <string name="minutes">minutes</string>
     <string name="app_icon">app_icon</string>
 
@@ -93,6 +96,12 @@
     <string name="title">Title</string>
     <string name="close">Close</string>
     <string name="proceed">Proceed</string>
+    <string name="warning_title_app_blocker">App Blocker Protection</string>
+    <string name="warning_title_reels_blocker">Reels/Shorts Protection</string>
+    <string name="warning_default_message_app">This app is currently blocked to help you stay focused.</string>
+    <string name="warning_default_message_reels">Reels/Shorts were blocked to protect your focus and time.</string>
+    <string name="warning_cancel_go_home">Go Home</string>
+    <string name="warning_cancel_stay_safe">Close</string>
     <string name="please_enable_device_admin">Please provide device admin permission to access this feature</string>
     <string name="setup_complete">Setup Complete</string>
     <string name="enter_setup">Enter Setup</string>
@@ -110,7 +119,7 @@
     <string name="anti_uninstall_is_active">⚠️ Anti-Uninstall protection is currently active.</string>
     
     <!-- Anti-Uninstall UI Strings -->
-    <string name="anti_uninstall_description">Prevent unauthorized uninstallation of DeenShield and protected apps using password or time-based protection</string>
+    <string name="anti_uninstall_description">Prevent unauthorized uninstalls and optionally block configuration changes using password or timed protection</string>
     <string name="enable_anti_uninstall_protection">Enable Anti-Uninstall Protection</string>
     <string name="anti_uninstall_disabled">Anti-uninstall protection is currently disabled</string>
     <string name="anti_uninstall_enabled">Anti-uninstall protection is active</string>
@@ -127,8 +136,8 @@
     <string name="anti_uninstall_disabled_successfully">Anti-uninstall protection disabled successfully</string>
     
     <!-- Anti-Uninstall Password Verification -->
-    <string name="anti_uninstall_password_required">Password Required</string>
-    <string name="enter_password_to_proceed_settings">Enter your password to access this Settings screen</string>
+    <string name="anti_uninstall_password_required">App Protection Verification</string>
+    <string name="enter_password_to_proceed_settings">Enter your password to continue, or use the 5-minute recovery fallback if you forgot it</string>
     <string name="password_verified">Password verified. Access granted.</string>
     <string name="verify">Verify</string>
     <string name="anti_uninstall_timed_mode_active">Timed Protection Active</string>
@@ -191,7 +200,7 @@
     <string name="alert">Alert!!</string>
     <string name="i_understand">I Understand</string>
     <string name="are_you_sure_you_want_to_turn_on_anti_uninstall_there_is_no_turning_back">ARE YOU SURE YOU WANT TO TURN ON ANTI UNINSTALL? There is no turning back...</string>
-    <string name="about_view_blocker">About View Blocker</string>
+    <string name="about_view_blocker">About Shorts Blocker</string>
     <string name="this_option_has_the_ability_to_block_youtube_shorts_and_instagram_reels_while_allowing_access_to_other_app_features">This option has the ability to block YouTube Shorts and Instagram Reels while allowing access to other app features.</string>
     <string name="configure_blocker">Configure Blocker</string>
     <string name="select_apps">Select Apps</string>
@@ -222,6 +231,9 @@
     <string name="welcome_to_deenshield">Welcome to DeenShield</string>
     <string name="protect_your_digital_wellbeing">Protect your digital wellbeing with powerful tools</string>
     <string name="quick_actions">Quick Actions</string>
+    <string name="hide_welcome_card">Hide welcome card</string>
+    <string name="welcome_card_hidden">Welcome card hidden</string>
+    <string name="undo">Undo</string>
     <string name="block_distracting_apps">Block distracting apps temporarily</string>
     <string name="permanently_block_apps">Permanently block specific apps</string>
     <string name="block_shorts_and_reels">Block YouTube Shorts &amp; Instagram Reels</string>
@@ -255,12 +267,12 @@
     <string name="help_and_faq">Help &amp; FAQ</string>
     <string name="help_and_faq_description">Common questions and troubleshooting</string>
     <string name="about_deenshield">About DeenShield</string>
-    <string name="app_version">Version 1.2.0</string>
+    <string name="app_version">Version 0.25.4.2026</string>
     <string name="github">GitHub</string>
     <string name="telegram">Telegram</string>
-    <string name="view_blocker">View Blocker</string>
+    <string name="view_blocker">Reels/Shorts Blocker</string>
     <string name="continue_anyway">Continue Anyway</string>
-    <string name="manage_view_blocker">Configure View Blocker</string>
+    <string name="manage_view_blocker">Configure Shorts Blocker</string>
     <string name="open_accessibility_settings">Open Accessibility Settings</string>
     <string name="welcome_message">Welcome to DeenShield! We\'re here to help you build healthier digital habits. This quick setup guide will walk you through the key features and permissions needed to get the most out of the app. Updates are delivered automatically through the Play Store.</string>
     <string name="terms_and_conditions">Terms &amp; Conditions</string>
@@ -292,7 +304,7 @@
     <string name="open_settings">Open settings</string>
     <string name="app_usage_others_label">Others</string>
     <string name="premium_required_title">Premium Required</string>
-    <string name="premium_required_message">Premium is required to unlock App Blocker, Focus Mode, View/Reel Blocker, and Anti-Uninstall Protection.</string>
+    <string name="premium_required_message">Premium is required to unlock App Blocker, Focus Mode, Shorts Blocker, Reel Blocker, and Anti-Uninstall Protection.</string>
     <string name="premium_required_message_short">Premium is required to use this feature.</string>
     <string name="premium_view_plans">View Premium Plans</string>
     <string name="premium_nav_upgrade">Premium Features</string>
@@ -300,15 +312,15 @@
     <string name="premium_locked">Premium</string>
     <string name="premium_unlock_chip">Unlock</string>
     <string name="premium_reminder_title">Unlock Premium Features</string>
-    <string name="premium_reminder_message">Upgrade to DeenShield Premium to unlock App Blocker, Focus Mode, View/Reel Blocker, and Anti-Uninstall Protection. Support the project while getting powerful tools for digital wellbeing.</string>
+    <string name="premium_reminder_message">Upgrade to DeenShield Premium to unlock App Blocker, Focus Mode, Reel Blocker, Anti-Uninstall Protection, and more. Support the project while protecting your digital wellbeing.</string>
     <string name="premium_features_title">Unlock DeenShield Premium</string>
-    <string name="premium_features_subtitle">Unlock powerful app blocking, focus sessions, and uninstall protection features.</string>
+    <string name="premium_features_subtitle">Unlock App Blocker, Focus Mode, Reel Blocker, Anti-Uninstall protection, and advanced digital wellbeing tools.</string>
     <string name="premium_features_includes">Premium includes:</string>
     <string name="premium_benefit_app_blocker">• App Blocker - Block distracting apps by category with auto-block, cheat hours, and custom warnings</string>
     <string name="premium_benefit_anti_uninstall">• Anti-Uninstall Protection - Password or time-based protection against uninstalling protected apps</string>
-    <string name="premium_benefit_priority_support">• Priority Support - Get help faster with dedicated premium user support channels</string>
-    <string name="premium_benefit_app_guard">• Anti-Uninstall Hardening - Keeps DeenShield protection active with strong removal safeguards</string>
-    <string name="premium_benefit_view_blocker">• View/Reel Blocker - Limit endless scrolling on Instagram Reels, YouTube Shorts, and TikTok</string>
+    <string name="premium_benefit_priority_support">• App Governance - Better control over protected apps and access integrity</string>
+    <string name="premium_benefit_app_guard">• Smart App Guard - Detects common bypass behavior and helps keep protection active</string>
+    <string name="premium_benefit_view_blocker">• Reel Blocker - Limit endless scrolling on Instagram Reels, YouTube Shorts, and TikTok videos</string>
     <string name="premium_benefit_focus_mode">• Focus Mode - Time-boxed app blocking with productivity tracking and session history</string>
     <string name="premium_benefit_reports">• Enhanced Statistics - Comprehensive blocking reports, trends, and productivity insights</string>
     <string name="premium_benefit_privacy">• Privacy First - Local processing, no tracking, and no external analytics</string>
@@ -328,6 +340,34 @@
     <string name="premium_restore_in_progress">Checking your premium status...</string>
     <string name="premium_already_active">Premium is already active.</string>
     <string name="premium_purchase_success">Premium unlocked! Additional protection features are now enabled.</string>
+    <string name="premium_no_previous_purchases">No previous purchases found.</string>
+    <string name="premium_card_title">Premium Access</string>
+    <string name="premium_card_status_premium">Premium</string>
+    <string name="premium_card_status_compassionate">Free Access</string>
+    <string name="premium_card_status_special">Special</string>
+    <string name="reel_blocker">Reels/Shorts Blocker</string>
+    <string name="block_changes_during_protection">Block changes to blockers while protection is active</string>
+    <string name="enable_block_changes_guard">Enable Block Changes Guard</string>
+    <string name="forgot_password_recovery">Forgot password? Start 5-minute recovery</string>
+    <string name="recovery_countdown_message">Recovery unlock in %1$02d:%2$02d</string>
+    <string name="recovery_started">Recovery started. Wait 5 minutes to unlock settings.</string>
+    <string name="recovery_ready">Recovery complete. Settings are unlocked for 5 minutes.</string>
+    <string name="start_recovery">Start Recovery</string>
+    <string name="enable_reel_blocker">Enable Reel Blocker</string>
+    <string name="reel_blocker_toggle_description">Toggle dedicated reel blocking behavior independently of general view blocking.</string>
+    <string name="reel_blocker_full_description">Block Instagram Reels, YouTube Shorts reels feed, and TikTok with dedicated reel controls.</string>
+    <string name="reel_blocker_platforms_title">Platforms to block</string>
+    <string name="reel_blocker_platforms_description">Choose where Reel Blocker should actively block short-form feeds.</string>
+    <string name="reel_blocker_platform_youtube">YouTube Shorts</string>
+    <string name="reel_blocker_platform_instagram">Instagram Reels</string>
+    <string name="reel_blocker_platform_tiktok">TikTok</string>
+    <string name="reel_blocker_platform_browser">Browser shorts/reels pages</string>
+    <string name="reel_blocker_platform_browser_hint">Helps block web-based shorts and reels pages inside supported browsers.</string>
+    <string name="reel_blocker_mode">Blocking Mode</string>
+    <string name="reel_block_after_count">Block only after daily reel limit</string>
+    <string name="reel_daily_limit_hint">Daily reel limit</string>
+    <string name="reel_daily_limit_validation">Enter a daily limit of at least 1 reel.</string>
+    <string name="shorts_blocker_description">Blocks YouTube Shorts and Instagram Reels surfaces in the Shorts Blocker flow.</string>
     <string name="compassionate_access_title">I Can\'t Afford to Pay</string>
     <string name="compassionate_access_description">Islamic Rahmah (Mercy): digital protection should be available to everyone. We trust you to be honest about your situation (amanah).</string>
     <string name="compassionate_access_button">Request Free Access</string>
@@ -346,6 +386,7 @@
     <string name="compassionate_access_error">Could not activate free access. Please contact support@alhaq-initiative.org.</string>
     <string name="compassionate_access_active">Free access active</string>
     <string name="compassionate_access_active_description">You currently have a compassionate-access premium grant on this device.</string>
+    <string name="compassionate_access_active_until">Compassionate access is active until %1$s.</string>
     <string name="compassionate_access_account_type">Compassionate Access</string>
     <string name="profile_compassionate_access_option">I can\'t afford to pay</string>
     <string name="profile_premium_access_title">Premium Access</string>
@@ -357,6 +398,7 @@
     <string name="special_access_title">Special Access</string>
     <string name="special_access_message">If you\'ve contacted contact@alhaq-initiative.org and received a special access ID, enter it below. This grants one year of premium access.</string>
     <string name="special_access_activate">Activate</string>
+    <string name="premium_special_access_button">Use Special Access ID</string>
     <string name="special_access_success">Special access activated.</string>
     <string name="special_access_invalid">Invalid access ID. Please check it and try again, or contact contact@alhaq-initiative.org.</string>
     
@@ -401,7 +443,7 @@
     <string name="subscription_reminder">Subscription reminder</string>
     <string name="custom_reminder_time">Custom reminder time</string>
     <string name="accessibility_permission_app_blocker">App Blocker</string>
-    <string name="accessibility_permission_view_blocker">View/Reel Blocker</string>
+    <string name="accessibility_permission_view_blocker">Shorts Blocker</string>
     <string name="accessibility_permission_usage_tracker">Usage Tracker</string>
     <string name="accessibility_permission_keyword_blocker">Keyword Blocker</string>
     <string name="accessibility_permission_general_features">General Features</string>
@@ -412,6 +454,13 @@
     <string name="device_admin">Device Admin</string>
     <string name="permission_status">Permission status</string>
     <string name="notifications">Notifications</string>
+    <string name="notifications_empty_title">You\'re all caught up</string>
+    <string name="notifications_empty_subtitle">In-app alerts from DeenShield will appear here.</string>
+    <string name="notifications_open_settings">Notification settings</string>
+    <string name="notifications_mark_all_read">Mark all as read</string>
+    <string name="notifications_clear_all">Clear all</string>
+    <string name="notifications_clear_all_confirm">Remove all notifications from your inbox? This won\'t change your reminder settings.</string>
+    <string name="notifications_reminder_settings">Reminder settings</string>
     <string name="granted">Granted</string>
     <string name="denied">Denied</string>
     
@@ -429,4 +478,25 @@
     <string name="light_mode">Light Mode</string>
     <string name="select_theme">Select Theme</string>
     <string name="search_apps">Search apps</string>
+
+    <!-- Error Reporting &amp; Feedback -->
+    <string name="error_reporting">Error Reporting &amp; Feedback</string>
+    <string name="crash_logs">Crash Logs</string>
+    <string name="enable_crash_reporting">Enable Crash Reporting</string>
+    <string name="enable_feedback_collection">Enable Feedback Collection</string>
+    <string name="view_crash_logs">View Crash Logs</string>
+    <string name="view_feedback_submitted">View Feedback Submitted</string>
+    <string name="export_all_logs">Export All Data (Email/Share)</string>
+    <string name="clear_all_error_data">Clear All Error Data (Permanent)</string>
+    <string name="crash_reporting_description">Save diagnostic information when app crashes</string>
+    <string name="feedback_collection_description">Allow feedback submission after crashes</string>
+    <string name="data_collection_notice">All error data is stored locally on your device. We never collect or send any data without your explicit permission.</string>
+    <string name="crash_recovery_title">Oops! We encountered an issue</string>
+    <string name="crash_recovery_description">DeenShield crashed unexpectedly. We\'ve saved diagnostic information.</string>
+    <string name="crash_help_us_improve">Help us improve</string>
+    <string name="crash_what_were_you_doing">Tell us what you were doing when this happened (optional)</string>
+    <string name="crash_feedback_category">Bug Report</string>
+    <string name="crash_user_email_hint">Your email (optional, for follow-up)</string>
+    <string name="crash_privacy_notice">Your crash data is stored locally. We never send it without your permission.</string>
+    <string name="continue_without_sending">Continue without sending</string>
 </resources>

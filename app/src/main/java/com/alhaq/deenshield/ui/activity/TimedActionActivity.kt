@@ -44,7 +44,7 @@ class TimedActionActivity : AppCompatActivity() {
     private var selectedMode = MODE_APP_BLOCKER_CHEAT_HOURS
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply theme before super.onCreate
-        val sharedPreferences = getSharedPreferences("com.alhaq.deenshield_preferences", MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("theme_prefs", MODE_PRIVATE)
         val themeStyle = sharedPreferences.getString("theme_style", "default")
         if (themeStyle == "gradient") {
             setTheme(R.style.Theme_DeenShield_Gradient)
@@ -262,12 +262,18 @@ class TimedActionActivity : AppCompatActivity() {
         when (selectedMode) {
             MODE_APP_BLOCKER_CHEAT_HOURS -> {
                 savedPreferencesLoader.saveAppBlockerCheatHoursList(timedActionList)
-                sendBroadcast(Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER))
+                sendBroadcast(
+                    Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                        .setPackage(packageName)
+                )
             }
 
             MODE_AUTO_FOCUS -> {
                 savedPreferencesLoader.saveAutoFocusHoursList(timedActionList)
-                sendBroadcast(Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE))
+                sendBroadcast(
+                    Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
+                        .setPackage(packageName)
+                )
             }
         }
     }

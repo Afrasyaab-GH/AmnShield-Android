@@ -1,6 +1,7 @@
 package com.alhaq.deenshield.ui.activity
 
 import android.content.Context
+import android.os.CountDownTimer
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,10 +19,17 @@ class AntiUninstallPasswordActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAntiUninstallPasswordBinding
     private var savedPassword: String? = null
     private var antiUninstallMode: Int = -1
+    private var recoveryTimer: CountDownTimer? = null
+
+    companion object {
+        private const val RECOVERY_WAIT_MILLIS = 5 * 60 * 1000L
+        private const val KEY_RECOVERY_UNLOCK_AT = "recovery_unlock_at"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply theme before super.onCreate
-        val sharedPreferences = getSharedPreferences("com.alhaq.deenshield_preferences", MODE_PRIVATE)
+        // Apply theme before super.onCreate. Read from the shared "theme_prefs"
+        // file (the one Settings writes to) so the gradient theme is honored.
+        val sharedPreferences = getSharedPreferences("theme_prefs", MODE_PRIVATE)
         val themeStyle = sharedPreferences.getString("theme_style", "default")
         if (themeStyle == "gradient") {
             setTheme(R.style.Theme_DeenShield_Gradient)
@@ -66,15 +74,29 @@ class AntiUninstallPasswordActivity : AppCompatActivity() {
         binding.passwordInputLayout.visibility = android.view.View.VISIBLE
         binding.btnCancel.visibility = android.view.View.VISIBLE
         binding.btnVerify.visibility = android.view.View.VISIBLE
+        binding.btnForgotPassword.visibility = android.view.View.VISIBLE
 
         binding.btnVerify.setOnClickListener {
             val enteredPassword = binding.passwordInput.text.toString()
-            
-            if (enteredPassword == savedPassword) {
-                // Password correct - notify accessibility service to start 5-minute cooldown
-                val intent = android.content.Intent(com.alhaq.deenshield.services.DeenShieldAccessibilityService.INTENT_ACTION_PASSWORD_VERIFIED)
-                sendBroadcast(intent)
-                
+
+            if (com.alhaq.deenshield.utils.PasswordHasher.verify(enteredPassword, savedPassword)) {
+                // If the stored value was the legacy plaintext format, silently upgrade it
+                // to the salted hash now that we know the password matched.
+                if (com.alhaq.deenshield.utils.PasswordHasher.isPlainText(savedPassword)) {
+                    val upgraded = com.alhaq.deenshield.utils.PasswordHasher.hash(enteredPassword)
+                    getSharedPreferences("anti_uninstall", Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("password", upgraded)
+                        .apply()
+                    savedPassword = upgraded
+                }
+
+                // Password correct - notify accessibility service to start 5-minute cooldown.
+                // Scope the broadcast to our own package to prevent third-party apps from
+                // sending the same action to bypass anti-uninstall.
+                clearRecoveryTimerState()
+                sendPasswordVerifiedBroadcast()
+
                 // Close activity to allow Settings access - user can continue where they were
                 finish()
             } else {
@@ -88,6 +110,24 @@ class AntiUninstallPasswordActivity : AppCompatActivity() {
             // User cancelled - close activity to return to previous Settings screen
             finish()
         }
+
+        binding.btnForgotPassword.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.start_recovery)
+                .setMessage(R.string.recovery_started)
+                .setPositiveButton(R.string.start_recovery) { _, _ ->
+                    val unlockAt = System.currentTimeMillis() + RECOVERY_WAIT_MILLIS
+                    getSharedPreferences("anti_uninstall", Context.MODE_PRIVATE)
+                        .edit()
+                        .putLong(KEY_RECOVERY_UNLOCK_AT, unlockAt)
+                        .apply()
+                    beginRecoveryCountdown(unlockAt)
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
+        maybeResumeRecoveryCountdown()
     }
 
     private fun setupTimedMode() {
@@ -121,6 +161,8 @@ class AntiUninstallPasswordActivity : AppCompatActivity() {
         binding.txtMessage.text = message
         binding.passwordInputLayout.visibility = android.view.View.GONE
         binding.btnVerify.visibility = android.view.View.GONE
+        binding.btnForgotPassword.visibility = android.view.View.GONE
+        binding.txtRecoveryStatus.visibility = android.view.View.GONE
         binding.btnCancel.text = getString(R.string.ok)
         binding.btnCancel.visibility = android.view.View.VISIBLE
 
@@ -134,5 +176,68 @@ class AntiUninstallPasswordActivity : AppCompatActivity() {
         super.onDestroy()
         // Clear password input to prevent memory leaks
         binding.passwordInput.text?.clear()
+        recoveryTimer?.cancel()
+        recoveryTimer = null
+    }
+
+    private fun maybeResumeRecoveryCountdown() {
+        val unlockAt = getSharedPreferences("anti_uninstall", Context.MODE_PRIVATE)
+            .getLong(KEY_RECOVERY_UNLOCK_AT, 0L)
+        if (unlockAt > 0L) {
+            beginRecoveryCountdown(unlockAt)
+        }
+    }
+
+    private fun beginRecoveryCountdown(unlockAt: Long) {
+        recoveryTimer?.cancel()
+
+        val remaining = unlockAt - System.currentTimeMillis()
+        if (remaining <= 0L) {
+            onRecoveryReady()
+            return
+        }
+
+        binding.btnForgotPassword.isEnabled = false
+        binding.txtRecoveryStatus.visibility = android.view.View.VISIBLE
+
+        recoveryTimer = object : CountDownTimer(remaining, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                val totalSeconds = millisUntilFinished / 1000L
+                val minutes = (totalSeconds / 60).toInt()
+                val seconds = (totalSeconds % 60).toInt()
+                binding.txtRecoveryStatus.text = getString(
+                    R.string.recovery_countdown_message,
+                    minutes,
+                    seconds
+                )
+            }
+
+            override fun onFinish() {
+                onRecoveryReady()
+            }
+        }.start()
+    }
+
+    private fun onRecoveryReady() {
+        clearRecoveryTimerState()
+        Toast.makeText(this, getString(R.string.recovery_ready), Toast.LENGTH_LONG).show()
+        sendPasswordVerifiedBroadcast()
+        finish()
+    }
+
+    private fun clearRecoveryTimerState() {
+        recoveryTimer?.cancel()
+        recoveryTimer = null
+        getSharedPreferences("anti_uninstall", Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_RECOVERY_UNLOCK_AT)
+            .apply()
+    }
+
+    private fun sendPasswordVerifiedBroadcast() {
+        val intent = android.content.Intent(
+            com.alhaq.deenshield.services.DeenShieldAccessibilityService.INTENT_ACTION_PASSWORD_VERIFIED
+        ).setPackage(packageName)
+        sendBroadcast(intent)
     }
 }

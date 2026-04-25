@@ -31,6 +31,86 @@
             android:orientation="vertical"
             android:padding="@dimen/padding_normal">
 
+            <!-- Date Navigation Row -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/spacing_small">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_prev_day"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/baseline_chevron_left_24"
+                        android:contentDescription="Previous day" />
+
+                    <TextView
+                        android:id="@+id/txt_report_date"
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:text="Today" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_next_day"
+                        style="@style/Widget.Material3.Button.IconButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/baseline_chevron_right_24"
+                        android:contentDescription="Next day" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Summary Chip Row -->
+            <LinearLayout
+                android:id="@+id/summary_chips_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_total_blocks"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/spacing_small"
+                    android:text="0 blocks"
+                    app:chipIcon="@drawable/baseline_stop_24" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_focus_time"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/spacing_small"
+                    android:text="0m focus"
+                    app:chipIcon="@drawable/ic_focus_mode" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_reels_scrolled"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 reels"
+                    app:chipIcon="@drawable/baseline_query_stats_24" />
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reports_recycler_view"
                 android:layout_width="match_parent"

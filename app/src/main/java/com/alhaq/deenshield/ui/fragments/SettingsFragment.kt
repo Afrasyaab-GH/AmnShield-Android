@@ -20,7 +20,9 @@ import com.alhaq.deenshield.databinding.FragmentSettingsBinding
 import com.alhaq.deenshield.ui.activity.MainActivity
 import com.alhaq.deenshield.ui.activity.FragmentActivity
 import com.alhaq.deenshield.ui.activity.RemindersActivity
+import com.alhaq.deenshield.services.DeenShieldAccessibilityService
 import com.alhaq.deenshield.premium.PremiumManager
+import com.alhaq.deenshield.utils.SavedPreferencesLoader
 import com.alhaq.deenshield.utils.ZipUtils
 import java.util.Locale
 
@@ -29,6 +31,7 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
     private val premiumManager by lazy { PremiumManager.getInstance(requireContext().applicationContext) }
+    private val savedPreferencesLoader by lazy { SavedPreferencesLoader(requireContext().applicationContext) }
     private var suppressFeatureSwitchChange = false
 
 
@@ -116,10 +119,17 @@ class SettingsFragment : Fragment() {
             }
 
             suppressFeatureSwitchChange = true
-            // View Blocker state
+
             val viewBlockerPrefs = requireContext().getSharedPreferences("view_blocker", android.content.Context.MODE_PRIVATE)
-            binding.switchViewBlocker.isChecked = viewBlockerPrefs.getBoolean("is_enabled", false)
+            binding.switchReelBlockerQuick.isChecked = savedPreferencesLoader.isReelBlockerEnabled(
+                viewBlockerPrefs.getBoolean("is_enabled", false)
+            )
+            binding.switchKeywordBlockerQuick.isChecked = savedPreferencesLoader.isKeywordBlockerFeatureEnabled()
+            binding.switchUsageTrackerQuick.isChecked = savedPreferencesLoader.isUsageTrackerFeatureEnabled()
+
             suppressFeatureSwitchChange = false
+
+            updateFeatureStatuses()
 
             // Load language preference
             updateLanguageStatus()
@@ -130,15 +140,41 @@ class SettingsFragment : Fragment() {
         // Theme selection
         binding.themeOption.setOnClickListener { showThemeSelectionDialog() }
 
-        // View Blocker toggle
-        binding.switchViewBlocker.setOnCheckedChangeListener { _, isChecked ->
+        // Low-risk quick toggles
+        binding.switchReelBlockerQuick.setOnCheckedChangeListener { _, isChecked ->
             if (suppressFeatureSwitchChange) return@setOnCheckedChangeListener
             if (!premiumManager.isPremium()) {
-                revertSwitch(binding.switchViewBlocker, false)
+                revertSwitch(binding.switchReelBlockerQuick, false)
                 showPremiumUpsell()
                 return@setOnCheckedChangeListener
             }
-            handleViewBlockerToggle(isChecked)
+            handleReelBlockerToggle(isChecked)
+        }
+
+        binding.switchKeywordBlockerQuick.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressFeatureSwitchChange) return@setOnCheckedChangeListener
+            savedPreferencesLoader.setKeywordBlockerFeatureEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+            updateFeatureStatuses()
+        }
+
+        binding.switchUsageTrackerQuick.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressFeatureSwitchChange) return@setOnCheckedChangeListener
+            savedPreferencesLoader.setUsageTrackerFeatureEnabled(isChecked)
+            updateFeatureStatuses()
+        }
+
+        // High-risk status rows open full config screens
+        binding.appBlockerOption.setOnClickListener {
+            openFeatureConfig("app_blocker", requiresPremium = true)
+        }
+
+        binding.focusModeOption.setOnClickListener {
+            openFeatureConfig("focus_mode", requiresPremium = true)
+        }
+
+        binding.antiUninstallOption.setOnClickListener {
+            openFeatureConfig("anti_uninstall", requiresPremium = true)
         }
 
         binding.backupOption.setOnClickListener {
@@ -167,23 +203,51 @@ class SettingsFragment : Fragment() {
             showAboutDialog()
         }
 
-        binding.telegramOption.setOnClickListener {
-            openUrl("https://t.me/deenshield6")
-        }
-
         binding.languageOption.setOnClickListener {
             showLanguageDialog()
         }
     }
 
-    private fun handleViewBlockerToggle(enabled: Boolean) {
+    private fun handleReelBlockerToggle(enabled: Boolean) {
         if (!premiumManager.isPremium()) {
-            revertSwitch(binding.switchViewBlocker, false)
+            revertSwitch(binding.switchReelBlockerQuick, false)
             showPremiumUpsell()
             return
         }
-        val viewBlockerPrefs = requireContext().getSharedPreferences("view_blocker", android.content.Context.MODE_PRIVATE)
-        viewBlockerPrefs.edit().putBoolean("is_enabled", enabled).apply()
+        savedPreferencesLoader.setReelBlockerEnabled(enabled)
+        sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        updateFeatureStatuses()
+    }
+
+    private fun updateFeatureStatuses() {
+        val appEnabled = premiumManager.isPremium() &&
+            savedPreferencesLoader.isAppBlockerFeatureEnabled() &&
+            savedPreferencesLoader.loadBlockedApps().isNotEmpty()
+        val focusEnabled = premiumManager.isPremium() && savedPreferencesLoader.getFocusModeData().isTurnedOn
+        val antiEnabled = premiumManager.isPremium() &&
+            requireContext().getSharedPreferences("anti_uninstall", android.content.Context.MODE_PRIVATE)
+                .getBoolean("is_anti_uninstall_on", false)
+
+        binding.txtAppBlockerStatus.text = if (appEnabled) getString(R.string.on) else getString(R.string.off)
+        binding.txtFocusModeStatus.text = if (focusEnabled) getString(R.string.on) else getString(R.string.off)
+        binding.txtAntiUninstallStatus.text = if (antiEnabled) getString(R.string.on) else getString(R.string.off)
+    }
+
+    private fun openFeatureConfig(featureType: String, requiresPremium: Boolean) {
+        if (requiresPremium && !premiumManager.isPremium()) {
+            showPremiumUpsell()
+            return
+        }
+
+        val intent = Intent(requireContext(), FragmentActivity::class.java).apply {
+            putExtra("feature_type", featureType)
+        }
+        startActivity(intent)
+    }
+
+    private fun sendRefreshRequest(action: String) {
+        val ctx = requireContext()
+        ctx.sendBroadcast(Intent(action).setPackage(ctx.packageName))
     }
 
     private fun handleDarkModeToggle(enabled: Boolean) {
@@ -304,7 +368,7 @@ class SettingsFragment : Fragment() {
                    3) Restart the app
                 
                 Q: Settings screen keeps closing?
-                A: This is anti-uninstall protection working. Enter your password to access Settings. If you forgot the password, you must wait until the timed mode date.
+                A: This is App Protection working. Enter your password to access Settings, or use the 5-minute recovery fallback on the verification screen if you forgot it.
                 
                 Q: Keyword blocker blocking system apps?
                 A: Go to Keyword Blocker → Configure → Add system apps like Settings, Launcher to "Ignored Apps" list.
@@ -329,17 +393,17 @@ class SettingsFragment : Fragment() {
                 A: Never. DeenShield only detects keywords and content in real-time, nothing is stored or transmitted.
                 
                 Q: Is DeenShield open source?
-                A: Yes! View the code at github.com/alhaq-initiative/DeenShield
+                A: No. DeenShield's core protection engine is closed-source. We focus on clear privacy documentation, on-device processing, and selective transparency where appropriate.
                 
                 ═══════════════════════════
                 📞 SUPPORT & CONTACT
                 ═══════════════════════════
                 
                 Q: How do I report bugs or request features?
-                A: Join our Telegram community at t.me/deenshield6 or open an issue on GitHub.
+                A: Use the in-app feedback option, email contact@alhaq-initiative.org, or contact us through our official website.
                 
                 Q: Is there a user guide?
-                A: Yes! Check our GitHub repository for detailed documentation and video tutorials.
+                A: Yes. Check our official website for documentation, policies, and updates.
                 
                 ═══════════════════════════
             """.trimIndent()
@@ -347,11 +411,11 @@ class SettingsFragment : Fragment() {
             MaterialAlertDialogBuilder(ctx)
                 .setTitle("Help & FAQ")
                 .setMessage(faqs)
-                .setPositiveButton("Telegram Support") { _, _ ->
-                    openUrl("https://t.me/deenshield6")
+                .setPositiveButton("Email Support") { _, _ ->
+                    openUrl("mailto:contact@alhaq-initiative.org")
                 }
-                .setNeutralButton("GitHub") { _, _ ->
-                    openUrl("https://github.com/alhaq-initiative/DeenShield")
+                .setNeutralButton("Website") { _, _ ->
+                    openUrl("https://alhaq-initiative.org")
                 }
                 .setNegativeButton("Close", null)
                 .show()
@@ -387,21 +451,21 @@ class SettingsFragment : Fragment() {
                 • All detection is on-device
                 • No data collection or tracking
                 • No internet required for core features
-                • Open source transparency
+                • Clear privacy documentation
                 
                 Developer: Al-Haq Initiative
-                Contact: t.me/deenshield6
-                GitHub: github.com/alhaq-initiative/DeenShield
+                Contact: contact@alhaq-initiative.org
+                Website: alhaq-initiative.org
             """.trimIndent()
 
             MaterialAlertDialogBuilder(ctx)
                 .setTitle(getString(R.string.about_deenshield))
                 .setMessage(message)
-                .setPositiveButton("GitHub") { _, _ ->
-                    openUrl("https://github.com/alhaq-initiative/DeenShield")
+                .setPositiveButton("Website") { _, _ ->
+                    openUrl("https://alhaq-initiative.org")
                 }
-                .setNeutralButton("Telegram") { _, _ ->
-                    openUrl("https://t.me/deenshield6")
+                .setNeutralButton("Email") { _, _ ->
+                    openUrl("mailto:contact@alhaq-initiative.org")
                 }
                 .setNegativeButton("Close", null)
                 .show()
@@ -559,6 +623,13 @@ class SettingsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (_binding != null) {
+            loadPreferences()
+        }
     }
 }
 

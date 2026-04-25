@@ -2,8 +2,10 @@ package com.alhaq.deenshield.ui.fragments
 
 import android.accessibilityservice.AccessibilityService
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.app.admin.DevicePolicyManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.TypedValue
@@ -13,8 +15,10 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.alhaq.deenshield.R
 import com.alhaq.deenshield.databinding.FragmentHomeBinding
+import com.alhaq.deenshield.receivers.AdminReceiver
 import com.alhaq.deenshield.services.DeenShieldAccessibilityService
 import com.alhaq.deenshield.utils.SavedPreferencesLoader
 import com.alhaq.deenshield.premium.PremiumManager
@@ -37,6 +41,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        updateWelcomeSectionVisibility()
         setupClickListeners()
         updateServiceStatus()
     }
@@ -70,13 +75,40 @@ class HomeFragment : Fragment() {
             launchFeatureActivity("usage_tracker")
         }
 
-        binding.cardViewBlocker.setOnClickListener {
-            launchFeatureActivity("view_blocker")
+        binding.cardReelBlocker.setOnClickListener {
+            launchFeatureActivity("reel_blocker")
         }
+
+        binding.cardAntiUninstall.setOnClickListener {
+            launchFeatureActivity("anti_uninstall")
+        }
+
+        binding.btnDismissWelcome.setOnClickListener {
+            savedPreferencesLoader.setHomeWelcomeCardVisible(false)
+            updateWelcomeSectionVisibility()
+            Snackbar.make(binding.root, R.string.welcome_card_hidden, Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo) {
+                    savedPreferencesLoader.setHomeWelcomeCardVisible(true)
+                    updateWelcomeSectionVisibility()
+                }
+                .show()
+        }
+    }
+
+    private fun updateWelcomeSectionVisibility() {
+        val showWelcome = savedPreferencesLoader.isHomeWelcomeCardVisible()
+        binding.cardWelcome.visibility = if (showWelcome) View.VISIBLE else View.GONE
+        binding.txtQuickActions.visibility = if (showWelcome) View.VISIBLE else View.GONE
     }
     
     private fun launchFeatureActivity(featureType: String) {
-        if (!premiumManager.isPremium() && (featureType == "app_blocker" || featureType == "focus_mode" || featureType == "view_blocker")) {
+        if (!premiumManager.isPremium() && (
+                featureType == "app_blocker" ||
+                featureType == "focus_mode" ||
+                featureType == "reel_blocker" ||
+                featureType == "anti_uninstall"
+            )
+        ) {
             showPremiumUpsell()
             return
         }
@@ -103,7 +135,7 @@ class HomeFragment : Fragment() {
             val hasBlockedApps = savedPreferencesLoader.loadBlockedApps().isNotEmpty()
             updateChipStatus(
                 binding.chipAppBlockerStatus,
-                isPremiumUser && hasBlockedApps && isMainServiceEnabled
+                isPremiumUser && savedPreferencesLoader.isAppBlockerFeatureEnabled() && hasBlockedApps && isMainServiceEnabled
             )
 
             // Update Keyword Blocker status
@@ -114,22 +146,83 @@ class HomeFragment : Fragment() {
             val isKeywordBlockerConfigured = hasCustomKeywords || hasAdultPack
             updateChipStatus(
                 binding.chipKeywordBlockerStatus,
-                isKeywordBlockerConfigured && isMainServiceEnabled
+                savedPreferencesLoader.isKeywordBlockerFeatureEnabled() && isKeywordBlockerConfigured && isMainServiceEnabled
             )
 
             // Update Usage Tracker status - not yet integrated into main service
             updateChipStatus(
                 binding.chipUsageTrackerStatus,
-                isMainServiceEnabled
+                savedPreferencesLoader.isUsageTrackerFeatureEnabled() && isMainServiceEnabled
             )
 
-            // Additional features card now points to premium plans/state
-            updateChipStatus(binding.chipAdditionalFeaturesStatus, isPremiumUser)
+            // Premium card status reflects access type (free, premium, compassionate, special)
+            updatePremiumCardStatus()
 
-            // Update View Blocker status
+            // Update Reel Blocker status (formerly View Blocker — now consolidated).
+            // Falls back to the legacy view_blocker enable flag for users upgrading
+            // from versions where reel blocking lived under that key.
             val viewBlockerPrefs = ctx.getSharedPreferences("view_blocker", android.content.Context.MODE_PRIVATE)
-            val isViewBlockerEnabled = viewBlockerPrefs.getBoolean("is_enabled", false)
-            updateChipStatus(binding.chipViewBlockerStatus, isViewBlockerEnabled && isMainServiceEnabled)
+            val legacyEnabled = viewBlockerPrefs.getBoolean("is_enabled", false)
+            val reelBlockerPrefs = ctx.getSharedPreferences("reel_blocker", android.content.Context.MODE_PRIVATE)
+            val isReelBlockerEnabled = reelBlockerPrefs.getBoolean("is_enabled", legacyEnabled)
+            updateChipStatus(binding.chipReelBlockerStatus, isReelBlockerEnabled && isMainServiceEnabled)
+
+            val antiUninstallPrefs = ctx.getSharedPreferences("anti_uninstall", Context.MODE_PRIVATE)
+            val isAntiUninstallEnabled = antiUninstallPrefs.getBoolean("is_anti_uninstall_on", false)
+            val hasDeviceAdmin = isDeviceAdminEnabled(ctx)
+            updateChipStatus(binding.chipAntiUninstallStatus, isAntiUninstallEnabled && hasDeviceAdmin)
+        }
+    }
+
+    private fun isDeviceAdminEnabled(ctx: Context): Boolean {
+        val devicePolicyManager = ctx.getSystemService(Context.DEVICE_POLICY_SERVICE) as? DevicePolicyManager
+        val adminComponent = ComponentName(ctx, AdminReceiver::class.java)
+        return devicePolicyManager?.isAdminActive(adminComponent) == true
+    }
+
+    private fun updatePremiumCardStatus() {
+        val chip = binding.chipAdditionalFeaturesStatus
+        when (premiumManager.getUserType()) {
+            PremiumManager.UserType.FREE -> {
+                chip.text = getString(R.string.premium_unlock_chip)
+                chip.chipBackgroundColor = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_errorContainer)
+                }
+                chip.setChipIconResource(R.drawable.baseline_stop_24)
+                chip.chipIconTint = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_onErrorContainer)
+                }
+            }
+            PremiumManager.UserType.PREMIUM -> {
+                chip.text = getString(R.string.premium_card_status_premium)
+                chip.chipBackgroundColor = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_primaryContainer)
+                }
+                chip.setChipIconResource(R.drawable.baseline_done_24)
+                chip.chipIconTint = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_primary)
+                }
+            }
+            PremiumManager.UserType.COMPASSIONATE -> {
+                chip.text = getString(R.string.premium_card_status_compassionate)
+                chip.chipBackgroundColor = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_tertiaryContainer)
+                }
+                chip.setChipIconResource(R.drawable.baseline_done_24)
+                chip.chipIconTint = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_onTertiaryContainer)
+                }
+            }
+            PremiumManager.UserType.SPECIAL -> {
+                chip.text = getString(R.string.premium_card_status_special)
+                chip.chipBackgroundColor = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_secondaryContainer)
+                }
+                chip.setChipIconResource(R.drawable.baseline_done_24)
+                chip.chipIconTint = context?.let {
+                    ContextCompat.getColorStateList(it, R.color.md_theme_onSecondaryContainer)
+                }
+            }
         }
     }
 

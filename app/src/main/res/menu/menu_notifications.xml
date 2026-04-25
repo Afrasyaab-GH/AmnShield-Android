@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_mark_all_read"
+        android:icon="@drawable/baseline_done_24"
+        android:title="@string/notifications_mark_all_read"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_clear_all"
+        android:icon="@drawable/baseline_delete_24"
+        android:title="@string/notifications_clear_all"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_reminder_settings"
+        android:title="@string/notifications_reminder_settings"
+        app:showAsAction="never" />
+</menu>

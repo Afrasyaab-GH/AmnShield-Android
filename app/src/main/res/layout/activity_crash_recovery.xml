@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_normal"
+    android:background="?attr/colorSurface">
+
+    <!-- Header -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorSurfaceVariant">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="0dp"
+            app:title="Crash Report" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scroll view for content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_normal">
+
+            <!-- Error icon and title -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="@dimen/padding_normal">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/baseline_warning_24"
+                    android:contentDescription="Error icon"
+                    android:tint="?attr/colorError"
+                    android:layout_marginBottom="@dimen/spacing_normal" />
+
+                <TextView
+                    android:id="@+id/crash_title"
+                    style="@style/TextAppearance.Material3.HeadlineSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/spacing_small" />
+
+                <TextView
+                    android:id="@+id/crash_description"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <!-- Error summary card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardBackgroundColor="?attr/colorErrorContainer">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.LabelSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="What happened:"
+                        android:textColor="?attr/colorOnErrorContainer"
+                        android:layout_marginBottom="@dimen/spacing_small" />
+
+                    <TextView
+                        android:id="@+id/error_summary"
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorOnErrorContainer"
+                        android:textIsSelectable="true" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Feedback section -->
+            <TextView
+                android:id="@+id/feedback_label"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/feedback_hint"
+                style="@style/TextAppearance.Material3.BodySmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginBottom="@dimen/spacing_normal" />
+
+            <!-- Feedback input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:boxBackgroundMode="outline"
+                app:counterEnabled="true"
+                app:counterMaxLength="500">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/feedback_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLength="500"
+                    android:gravity="top|start"
+                    android:hint="What were you doing when the crash occurred?" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Category selector -->
+            <TextView
+                android:id="@+id/feedback_category"
+                style="@style/TextAppearance.Material3.LabelSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_small"
+                android:background="?attr/colorSurfaceVariant"
+                android:text="Category: Crash" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_small"
+                app:boxBackgroundMode="outline">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/user_name_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName|textCapWords"
+                    android:hint="Your name (optional, otherwise Anonymous)" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Email input (optional) -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:boxBackgroundMode="outline">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/user_email_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:hint="Your email (optional, for follow-up)" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/share_feedback_with_logs_checkbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                android:checked="true"
+                android:text="Also open share screen with this feedback and the saved crash logs" />
+
+            <!-- Privacy notice -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.LabelSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Privacy Notice"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_small" />
+
+                    <TextView
+                        android:id="@+id/tv_data_collection_notice"
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:textStyle="italic" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Action buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:padding="@dimen/padding_normal"
+        android:spacing="@dimen/spacing_normal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_continue"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Continue" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_send_feedback"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:text="Send Feedback" />
+    </LinearLayout>
+
+</LinearLayout>

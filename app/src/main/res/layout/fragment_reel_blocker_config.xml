@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Status Card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/status_card"
         android:layout_width="match_parent"
@@ -39,7 +38,6 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Configuration Container -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/config_container"
         android:layout_width="match_parent"
@@ -52,13 +50,12 @@
             android:orientation="vertical"
             android:padding="@dimen/padding_normal">
 
-            <!-- Header -->
             <TextView
                 style="@style/TextAppearance.Material3.HeadlineSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="@string/view_blocker"
+                android:text="@string/reel_blocker"
                 android:textStyle="bold" />
 
             <TextView
@@ -66,10 +63,172 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="@string/this_option_has_the_ability_to_block_youtube_shorts_and_instagram_reels_while_allowing_access_to_other_app_features"
+                android:text="@string/reel_blocker_full_description"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
-            <!-- Warning Screen Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reel_blocker"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/reel_blocker_toggle_description"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_reel_blocker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/enable_reel_blocker" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Per-platform + browser toggles -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reel_blocker_platforms_title"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/reel_blocker_platforms_description"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_youtube"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/reel_blocker_platform_youtube" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_instagram"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/reel_blocker_platform_instagram" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_tiktok"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/reel_blocker_platform_tiktok" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="4dp"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_browser"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/reel_blocker_platform_browser" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/reel_blocker_platform_browser_hint"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reel_blocker_mode"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_count_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/reel_block_after_count" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_limit_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="@string/reel_daily_limit_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/input_daily_limit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_save_mode"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/save"
+                        app:icon="@drawable/baseline_done_24" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -90,14 +249,6 @@
                         android:text="@string/manage_warning_screen"
                         android:textStyle="bold" />
 
-                    <TextView
-                        style="@style/TextAppearance.Material3.BodySmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Customize warning messages and behavior"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_warning_screen"
                         style="@style/Widget.Material3.Button.TonalButton"
@@ -109,7 +260,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Cheat Hours Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -130,14 +280,6 @@
                         android:text="@string/manage_cheat_hours"
                         android:textStyle="bold" />
 
-                    <TextView
-                        style="@style/TextAppearance.Material3.BodySmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Set times when view blocking is paused"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_cheat_hours"
                         style="@style/Widget.Material3.Button.TonalButton"
@@ -148,48 +290,6 @@
                         app:icon="@drawable/baseline_date_range_24" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- Info Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="?attr/colorPrimaryContainer"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/padding_normal">
-
-                    <TextView
-                        style="@style/TextAppearance.Material3.TitleMedium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/about_view_blocker"
-                        android:textColor="?attr/colorOnPrimaryContainer"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        style="@style/TextAppearance.Material3.BodySmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Learn how view blocker works"
-                        android:textColor="?attr/colorOnPrimaryContainer" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_help"
-                        style="@style/Widget.Material3.Button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/learn_more"
-                        app:icon="@drawable/baseline_help_outline_24" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

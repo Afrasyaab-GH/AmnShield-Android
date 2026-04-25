@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.alhaq.deenshield.R
@@ -15,12 +16,14 @@ import com.alhaq.deenshield.ui.activity.FragmentActivity
 import com.alhaq.deenshield.ui.activity.ReportsActivity
 import com.alhaq.deenshield.ui.activity.UsageMetricsActivity
 import com.alhaq.deenshield.ui.fragments.usage.AllAppsUsageFragment
+import com.alhaq.deenshield.utils.BlockingStatsManager
 import com.alhaq.deenshield.utils.UsageStatsHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
+import java.util.Locale
 
 class StatsFragment : Fragment() {
 
@@ -119,18 +122,18 @@ class StatsFragment : Fragment() {
 
                     // Get usage stats using getForegroundStatsByTimestamps
                     val statsList = usageStatsHelper.getForegroundStatsByTimestamps(startTime, endTime)
-                    val totalTime = statsList.sumBy { it.totalTime.toInt() }.toLong()
-                    
-                    // Get reels count - using string literals since constants may not be defined
-                    val sp = ctx.getSharedPreferences("usage_metrics", android.content.Context.MODE_PRIVATE)
-                    val reelsToday = sp.getInt("total_reels", 0)
-                    
+                    val totalTime = statsList.sumOf { it.totalTime }
+
                     // Get yesterday's reels count for comparison
                     val savedPreferencesLoader = com.alhaq.deenshield.utils.SavedPreferencesLoader(ctx)
                     val reelsData = savedPreferencesLoader.getReelsScrolled()
+                    val todayDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                    val reelsToday = reelsData[todayDate] ?: 0
                     val yesterdayDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).let { formatter ->
-                        calendar.add(Calendar.DAY_OF_YEAR, -1)
-                        formatter.format(calendar.time)
+                        val yesterdayCal = Calendar.getInstance().apply {
+                            add(Calendar.DAY_OF_YEAR, -1)
+                        }
+                        formatter.format(yesterdayCal.time)
                     }
                     val yesterdayReels = reelsData[yesterdayDate] ?: 0
 
@@ -145,16 +148,39 @@ class StatsFragment : Fragment() {
 
                         // Update reels count
                         binding.txtReelsCount.text = reelsToday.toString()
-                        
-                        // Calculate percentage change
+
+                        // Calculate percentage change and color-code
                         val percentage = if (yesterdayReels > 0) {
                             ((reelsToday - yesterdayReels).toFloat() / yesterdayReels * 100).toInt()
                         } else {
                             0
                         }
                         binding.txtReelsPercentage.text = if (percentage >= 0) "+$percentage%" else "$percentage%"
+                        // Red = more reels (worse), Green = fewer reels (better)
+                        val pctColor = if (percentage <= 0)
+                            ContextCompat.getColor(requireContext(), R.color.md_theme_primary)
+                        else
+                            ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
+                        binding.txtReelsPercentage.setTextColor(pctColor)
+
+                        // Update daily report summary with live blocking stats
+                        val blockStats = BlockingStatsManager.getInstance(ctx).getTodayStats()
+                        val totalBlocks = blockStats.appBlocksCount + blockStats.keywordBlocksCount + blockStats.viewBlocksCount
+                        val summaryParts = mutableListOf<String>()
+                        if (totalBlocks > 0) summaryParts.add("$totalBlocks blocks")
+                        if (blockStats.focusSessionsCount > 0) summaryParts.add("${blockStats.focusSessionsCount} focus sessions")
+                        if (blockStats.totalFocusMinutes > 0) summaryParts.add("${formatMinutes(blockStats.totalFocusMinutes)} focus time")
+                        if (reelsToday > 0) summaryParts.add("$reelsToday reels scrolled")
+                        binding.dailyReportSummary.text = if (summaryParts.isNotEmpty())
+                            summaryParts.joinToString(" · ")
+                        else
+                            "No activity recorded yet today."
 
                         // Update top apps
+                        binding.txtTopApp1.text = "1. No usage yet"
+                        binding.txtTopApp2.text = "2. No usage yet"
+                        binding.txtTopApp3.text = "3. No usage yet"
+
                         if (sortedApps.isNotEmpty()) {
                             val app1 = sortedApps.getOrNull(0)
                             if (app1 != null) {
@@ -201,5 +227,15 @@ class StatsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun formatMinutes(totalMinutes: Long): String {
+        val hours = totalMinutes / 60
+        val mins = totalMinutes % 60
+        return when {
+            hours > 0 && mins > 0 -> String.format(Locale.getDefault(), "%dh %dm", hours, mins)
+            hours > 0 -> String.format(Locale.getDefault(), "%dh", hours)
+            else -> String.format(Locale.getDefault(), "%dm", mins)
+        }
     }
 }

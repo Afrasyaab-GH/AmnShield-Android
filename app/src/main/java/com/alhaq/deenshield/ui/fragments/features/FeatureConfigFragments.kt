@@ -1,6 +1,7 @@
 package com.alhaq.deenshield.ui.fragments.features
 
 import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.alhaq.deenshield.R
+import com.alhaq.deenshield.blockers.ReelBlocker
 import com.alhaq.deenshield.services.DeenShieldAccessibilityService
 import com.alhaq.deenshield.ui.activity.SelectAppsActivity
 import com.alhaq.deenshield.ui.activity.TimedActionActivity
@@ -90,6 +92,16 @@ class AppBlockerConfigFragment : BaseFeatureFragment() {
 
         binding.statusCard.visibility = View.GONE
         binding.configContainer.visibility = View.VISIBLE
+
+        val isFeatureEnabled = savedPreferencesLoader.isAppBlockerFeatureEnabled()
+        binding.switchAppBlockerEnabled.isChecked = isFeatureEnabled
+        setAppBlockerControlsEnabled(isFeatureEnabled)
+
+        binding.switchAppBlockerEnabled.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setAppBlockerFeatureEnabled(isChecked)
+            setAppBlockerControlsEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+        }
         
         updateSelectedAppsCount(savedPreferencesLoader.loadBlockedApps().size)
 
@@ -170,28 +182,40 @@ class AppBlockerConfigFragment : BaseFeatureFragment() {
         binding.txtSelectedAppsCount.text = getString(R.string.app_s_selected, count)
     }
 
+    private fun setAppBlockerControlsEnabled(enabled: Boolean) {
+        binding.btnSelectApps.isEnabled = enabled
+        binding.btnCheatHours.isEnabled = enabled
+        binding.btnWarningScreen.isEnabled = enabled
+        binding.switchAutoBlock.isEnabled = enabled
+        binding.btnSelectCategories.isEnabled = enabled
+    }
+
     companion object {
         const val FRAGMENT_ID = "app_blocker_config"
     }
 }
 
+// NOTE: ViewBlockerConfigFragment was removed in v1.1.x when the View Blocker
+// feature was consolidated into Reel Blocker (per-platform + browser toggles).
+// Its layout (fragment_view_blocker_config.xml) was deleted alongside it. Any
+// surviving "view_blocker" deep links are silently dropped by FragmentActivity.
+
 /**
- * Comprehensive View Blocker configuration screen
+ * Dedicated Reel Blocker configuration screen with count-based limit mode.
  */
-class ViewBlockerConfigFragment : BaseFeatureFragment() {
-    
-    private var _binding: com.alhaq.deenshield.databinding.FragmentViewBlockerConfigBinding? = null
+class ReelBlockerConfigFragment : BaseFeatureFragment() {
+
+    private var _binding: com.alhaq.deenshield.databinding.FragmentReelBlockerConfigBinding? = null
     private val binding get() = _binding!!
-    
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = com.alhaq.deenshield.databinding.FragmentViewBlockerConfigBinding.inflate(inflater, container, false)
+        _binding = com.alhaq.deenshield.databinding.FragmentReelBlockerConfigBinding.inflate(inflater, container, false)
 
-        // Check Premium status first
-        val premiumManager = com.alhaq.deenshield.premium.PremiumManager.getInstance(requireContext().applicationContext)
+        val premiumManager = PremiumManager.getInstance(requireContext().applicationContext)
         if (!premiumManager.isPremium()) {
             binding.configContainer.visibility = View.GONE
             binding.statusCard.visibility = View.VISIBLE
@@ -205,7 +229,6 @@ class ViewBlockerConfigFragment : BaseFeatureFragment() {
             return binding.root
         }
 
-        // Check service status
         if (!isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)) {
             binding.configContainer.visibility = View.GONE
             binding.statusCard.visibility = View.VISIBLE
@@ -220,38 +243,94 @@ class ViewBlockerConfigFragment : BaseFeatureFragment() {
         binding.statusCard.visibility = View.GONE
         binding.configContainer.visibility = View.VISIBLE
 
+        val viewBlockerPrefs = requireContext().getSharedPreferences("view_blocker", Context.MODE_PRIVATE)
+        val enabled = savedPreferencesLoader.isReelBlockerEnabled(
+            viewBlockerPrefs.getBoolean("is_enabled", false)
+        )
+        val mode = savedPreferencesLoader.getReelBlockerMode(ReelBlocker.MODE_BLOCK_ALL)
+        val limit = savedPreferencesLoader.getReelBlockerDailyLimit(200)
+
+        binding.switchReelBlocker.isChecked = enabled
+        binding.switchCountMode.isChecked = mode == ReelBlocker.MODE_BLOCK_AFTER_DAILY_COUNT
+        binding.inputDailyLimit.setText(limit.toString())
+        binding.inputLimitLayout.isEnabled = binding.switchCountMode.isChecked
+
+        // Per-platform / browser toggles. ReelBlocker honors these at detection
+        // time; flipping a switch broadcasts a refresh so the running service
+        // picks up the change without an app restart.
+        binding.switchYoutube.isChecked = savedPreferencesLoader.isReelBlockerYoutubeEnabled()
+        binding.switchInstagram.isChecked = savedPreferencesLoader.isReelBlockerInstagramEnabled()
+        binding.switchTiktok.isChecked = savedPreferencesLoader.isReelBlockerTiktokEnabled()
+        binding.switchBrowser.isChecked = savedPreferencesLoader.isReelBlockerBrowserEnabled()
+
+        binding.switchYoutube.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setReelBlockerYoutubeEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        }
+        binding.switchInstagram.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setReelBlockerInstagramEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        }
+        binding.switchTiktok.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setReelBlockerTiktokEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        }
+        binding.switchBrowser.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setReelBlockerBrowserEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        }
+
+        binding.switchReelBlocker.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setReelBlockerEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        }
+
+        binding.switchCountMode.setOnCheckedChangeListener { _, isChecked ->
+            val selectedMode = if (isChecked) {
+                ReelBlocker.MODE_BLOCK_AFTER_DAILY_COUNT
+            } else {
+                ReelBlocker.MODE_BLOCK_ALL
+            }
+            binding.inputLimitLayout.isEnabled = isChecked
+            savedPreferencesLoader.setReelBlockerMode(selectedMode)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        }
+
+        binding.btnSaveMode.setOnClickListener {
+            val parsed = binding.inputDailyLimit.text?.toString()?.trim()?.toIntOrNull()
+            if (parsed == null || parsed < 1) {
+                Toast.makeText(requireContext(), getString(R.string.reel_daily_limit_validation), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            savedPreferencesLoader.setReelBlockerDailyLimit(parsed)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
+        }
+
         binding.btnWarningScreen.setOnClickListener {
             TweakViewBlockerWarning(savedPreferencesLoader).show(
                 childFragmentManager,
-                "tweak_view_blocker_warning"
+                "tweak_reel_blocker_warning"
             )
         }
 
         binding.btnCheatHours.setOnClickListener {
             TweakViewBlockerCheatHours(savedPreferencesLoader).show(
                 childFragmentManager,
-                "tweak_view_blocker_cheat_hours"
+                "tweak_reel_blocker_cheat_hours"
             )
-        }
-
-        binding.btnHelp.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(R.string.about_view_blocker))
-                .setMessage(getString(R.string.this_option_has_the_ability_to_block_youtube_shorts_and_instagram_reels_while_allowing_access_to_other_app_features))
-                .setPositiveButton(getString(R.string.ok), null)
-                .show()
         }
 
         return binding.root
     }
-    
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
-        const val FRAGMENT_ID = "view_blocker_config"
+        const val FRAGMENT_ID = "reel_blocker_config"
     }
 }
 
@@ -298,6 +377,15 @@ class UsageTrackerConfigFragment : BaseFeatureFragment() {
         binding.statusCard.visibility = View.GONE
         binding.configContainer.visibility = View.VISIBLE
 
+        val isFeatureEnabled = savedPreferencesLoader.isUsageTrackerFeatureEnabled()
+        binding.switchUsageTrackerEnabled.isChecked = isFeatureEnabled
+        setUsageTrackerControlsEnabled(isFeatureEnabled)
+
+        binding.switchUsageTrackerEnabled.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setUsageTrackerFeatureEnabled(isChecked)
+            setUsageTrackerControlsEnabled(isChecked)
+        }
+
         binding.btnTrackerToggles.setOnClickListener {
             TweakUsageTracker(savedPreferencesLoader).show(
                 childFragmentManager,
@@ -322,6 +410,12 @@ class UsageTrackerConfigFragment : BaseFeatureFragment() {
         }
 
         return binding.root
+    }
+
+    private fun setUsageTrackerControlsEnabled(enabled: Boolean) {
+        binding.btnTrackerToggles.isEnabled = enabled
+        binding.btnSelectOverlayApps.isEnabled = enabled
+        binding.btnViewMetrics.isEnabled = enabled
     }
     
     override fun onDestroyView() {
@@ -378,6 +472,16 @@ class KeywordBlockerConfigFragment : BaseFeatureFragment() {
         binding.statusCard.visibility = View.GONE
         binding.configContainer.visibility = View.VISIBLE
 
+        val isFeatureEnabled = savedPreferencesLoader.isKeywordBlockerFeatureEnabled()
+        binding.switchKeywordBlockerEnabled.isChecked = isFeatureEnabled
+        setKeywordBlockerControlsEnabled(isFeatureEnabled)
+
+        binding.switchKeywordBlockerEnabled.setOnCheckedChangeListener { _, isChecked ->
+            savedPreferencesLoader.setKeywordBlockerFeatureEnabled(isChecked)
+            setKeywordBlockerControlsEnabled(isChecked)
+            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+        }
+
         updateKeywordCount(savedPreferencesLoader.loadBlockedKeywords().size)
 
         binding.btnManageKeywords.setOnClickListener {
@@ -413,6 +517,12 @@ class KeywordBlockerConfigFragment : BaseFeatureFragment() {
 
     private fun updateKeywordCount(count: Int) {
         binding.txtKeywordCount.text = "$count keywords blocked"
+    }
+
+    private fun setKeywordBlockerControlsEnabled(enabled: Boolean) {
+        binding.btnManageKeywords.isEnabled = enabled
+        binding.btnKeywordPacks.isEnabled = enabled
+        binding.btnKeywordConfig.isEnabled = enabled
     }
 
     companion object {

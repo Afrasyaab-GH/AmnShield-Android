@@ -8,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityOptionsCompat
@@ -42,17 +43,38 @@ abstract class BaseFeatureFragment : Fragment() {
         val enabledServices = Settings.Secure.getString(
             requireContext().contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        ) ?: return false
+        ).orEmpty()
         val accessibilityEnabled = Settings.Secure.getInt(
             requireContext().contentResolver,
             Settings.Secure.ACCESSIBILITY_ENABLED,
             0
         )
-        return accessibilityEnabled == 1 && enabledServices.contains(componentName.flattenToString())
+        if (accessibilityEnabled != 1) return false
+
+        // OEM ROMs may serialize enabled services with short/full class names.
+        // Normalize and compare against both full and short component forms.
+        val expected = setOf(
+            componentName.flattenToString().lowercase(),
+            componentName.flattenToShortString().lowercase(),
+            "${componentName.packageName}/${componentName.className}".lowercase(),
+            "${componentName.packageName}/${componentName.shortClassName}".lowercase()
+        )
+
+        val splitter = TextUtils.SimpleStringSplitter(':')
+        splitter.setString(enabledServices)
+        for (entry in splitter) {
+            val normalized = entry.trim().lowercase()
+            if (normalized in expected) return true
+        }
+
+        return false
     }
 
     protected fun sendRefreshRequest(action: String) {
-        requireContext().sendBroadcast(Intent(action))
+        // Restrict broadcast to our own process so a non-exported receiver still
+        // receives it on API 33+ and external apps cannot intercept refresh signals.
+        val ctx = requireContext()
+        ctx.sendBroadcast(Intent(action).setPackage(ctx.packageName))
     }
 
     protected fun showAccessibilityInfoDialog(title: String, serviceClass: Class<*>) {

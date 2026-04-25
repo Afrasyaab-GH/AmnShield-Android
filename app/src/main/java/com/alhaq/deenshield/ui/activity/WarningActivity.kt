@@ -33,10 +33,18 @@ class WarningActivity : AppCompatActivity() {
         }
         val binding = DialogWarningOverlayBinding.inflate(layoutInflater)
         val isHomePressRequested = intent.getBooleanExtra("is_press_home", false)
+        val isReelBlockerWarning = intent.getBooleanExtra("is_reel_blocker", false)
+        val isAppBlockerMode = mode == Constants.WARNING_SCREEN_MODE_APP_BLOCKER
+
+        binding.warningTitle.text = if (isAppBlockerMode) {
+            getString(R.string.warning_title_app_blocker)
+        } else {
+            getString(R.string.warning_title_reels_blocker)
+        }
+
         binding.minsPicker.setValue(3)
         binding.minsPicker.minValue = 2
-        val isDialogCancelable =
-            mode != Constants.WARNING_SCREEN_MODE_APP_BLOCKER || isHomePressRequested
+        val isDialogCancelable = !isAppBlockerMode || isHomePressRequested
 
         if (warningScreenConfig.isProceedDisabled) {
             binding.btnProceed.visibility = View.GONE
@@ -67,28 +75,47 @@ class WarningActivity : AppCompatActivity() {
             .setView(binding.root)
             .setCancelable(isDialogCancelable)
             .setOnCancelListener {
-                finishAffinity()
+                finish()
             }
             .show()
-        binding.warningMsg.text = warningScreenConfig.message
+
+        val fallbackMessage = if (isAppBlockerMode) {
+            getString(R.string.warning_default_message_app)
+        } else {
+            getString(R.string.warning_default_message_reels)
+        }
+        val configuredMessage = warningScreenConfig.message.trim()
+        binding.warningMsg.text = if (configuredMessage.isNotEmpty()) configuredMessage else fallbackMessage
+
         binding.minsPicker.setValue(warningScreenConfig.timeInterval / 60000)
+        binding.btnCancel.text = if (isAppBlockerMode || isHomePressRequested) {
+            getString(R.string.warning_cancel_go_home)
+        } else {
+            getString(R.string.warning_cancel_stay_safe)
+        }
+
         binding.btnCancel.setOnClickListener {
-            if (mode == Constants.WARNING_SCREEN_MODE_APP_BLOCKER || isHomePressRequested) {
+            if (isAppBlockerMode || isHomePressRequested) {
                 val intent = Intent(Intent.ACTION_MAIN)
                 intent.addCategory(Intent.CATEGORY_HOME)
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
             }
             dialog?.dismiss()
-            finishAffinity()
+            finish()
         }
         binding.btnProceed.setOnClickListener {
             if (mode == Constants.WARNING_SCREEN_MODE_VIEW_BLOCKER) {
                 intent.getStringExtra("result_id")
                     ?.let { it1 ->
+                        val refreshAction = if (isReelBlockerWarning) {
+                            DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER_COOLDOWN
+                        } else {
+                            DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER_COOLDOWN
+                        }
                         sendRefreshRequest(
                             it1,
-                            DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER_COOLDOWN,
+                            refreshAction,
                             binding.minsPicker.getValue()
                         )
                     }
@@ -117,14 +144,14 @@ class WarningActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        proceedTimer?.onFinish()
+        proceedTimer?.cancel()
         dialog?.dismiss()  // Ensure dialog is dismissed before activity is destroyed
 
 
     }
 
     private fun sendRefreshRequest(id: String, action: String, time: Int) {
-        val intent = Intent(action)
+        val intent = Intent(action).setPackage(packageName)
         intent.putExtra("result_id", id)
         intent.putExtra("selected_time", time * 60_000)
         sendBroadcast(intent)

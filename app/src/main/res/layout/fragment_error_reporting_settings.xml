@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_normal">
+
+            <!-- Header -->
+            <TextView
+                style="@style/TextAppearance.Material3.HeadlineSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Error Reporting &amp; Feedback"
+                android:textStyle="bold"
+                android:layout_marginBottom="@dimen/spacing_normal" />
+
+            <!-- Privacy notice -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="All error data is stored locally on your device. We never collect or send any data without your explicit permission. You have full control over your diagnostic information."
+                        android:textColor="?attr/colorOnPrimaryContainer" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Crash Reporting Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Crash Reporting"
+                android:textStyle="bold"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_small" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.LabelLarge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Enable Crash Reporting"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Save diagnostic information when app crashes"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="@dimen/spacing_tiny" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_crash_reporting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_normal" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Feedback Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="User Feedback"
+                android:textStyle="bold"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_small" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.LabelLarge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Enable Feedback Collection"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Allow feedback submission after crashes"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:layout_marginTop="@dimen/spacing_tiny" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_feedback_collection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_normal" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Data Management Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Data Management"
+                android:textStyle="bold"
+                android:layout_marginTop="@dimen/spacing_normal"
+                android:layout_marginBottom="@dimen/spacing_small" />
+
+            <!-- View Crash Logs -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_view_crash_logs"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="View Crash Logs"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="@dimen/padding_normal"
+                    app:icon="@drawable/baseline_info_24"
+                    app:iconGravity="start" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- View Feedback -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_view_feedback"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="View Feedback Submitted"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="@dimen/padding_normal"
+                    app:icon="@drawable/baseline_help_outline_24"
+                    app:iconGravity="start" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Export Logs -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_export_logs"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Export All Data (Email/Share)"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="@dimen/padding_normal"
+                    app:icon="@drawable/baseline_share_24"
+                    app:iconGravity="start" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Clear All Data -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_normal"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="?attr/colorErrorContainer">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_clear_all_data"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Clear All Error Data (Permanent)"
+                    android:textColor="?attr/colorError"
+                    android:gravity="start|center_vertical"
+                    android:paddingStart="@dimen/padding_normal"
+                    app:icon="@drawable/baseline_delete_24"
+                    app:iconGravity="start" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Info section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_normal">
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.LabelSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="How we use this data"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_small" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodySmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="• Crash logs help us identify and fix bugs\n• Feedback helps us understand your experience\n• All data stays on your device by default\n• You choose when and how to share\n• You can delete everything anytime"
+                        android:textColor="?attr/colorOnSecondaryContainer" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

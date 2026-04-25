@@ -131,9 +131,9 @@ class AppBlocker:BaseBlocker() {
             packageNames.forEach { packageName ->
 
                 if (cheatHours.containsKey(packageName)) {
-                    val cheatHourTimeData: List<Pair<Int, Int>>? = cheatHours[packageName]
+                    val cheatHourTimeData = cheatHours[packageName].orEmpty()
                     val cheatHourNewTimeData: MutableList<Pair<Int, Int>> =
-                        cheatHourTimeData!!.toMutableList()
+                        cheatHourTimeData.toMutableList()
 
                     cheatHourNewTimeData.add(Pair(startTime, endTime))
                     cheatHours[packageName] = cheatHourNewTimeData

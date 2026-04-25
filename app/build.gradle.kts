@@ -20,7 +20,7 @@ android {
     signingConfigs {
         create("release") {
             if (keystorePropertiesFile.exists()) {
-                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
@@ -32,8 +32,8 @@ android {
         applicationId = "com.alhaq.deenshield"
         minSdk = 26
         targetSdk = 36
-        versionCode = 121
-        versionName = "1.2.1"
+        versionCode = 122
+        versionName = "0.25.4.2026"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         // Fix for 16 KB page size devices (Android 15+)

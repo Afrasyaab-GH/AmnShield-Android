@@ -60,15 +60,16 @@ import com.alhaq.deenshield.ui.fragments.SettingsFragment
 import com.alhaq.deenshield.ui.activity.FragmentActivity
 import com.alhaq.deenshield.ui.fragments.installation.AccessibilityGuide
 import com.alhaq.deenshield.ui.fragments.installation.WelcomeFragment
+import com.alhaq.deenshield.utils.ErrorReportManager
 import com.alhaq.deenshield.utils.SavedPreferencesLoader
 import com.alhaq.deenshield.utils.PermissionGuideHelper
 import com.alhaq.deenshield.utils.GoogleSignInHelper
+import com.alhaq.deenshield.utils.UserFeedback
 import com.alhaq.deenshield.utils.ZipUtils
 import com.alhaq.deenshield.utils.BillingClientWrapper
 import com.alhaq.deenshield.premium.PremiumManager
 import com.alhaq.deenshield.permissions.PermissionsBottomSheet
 import com.alhaq.deenshield.permissions.PermissionsManager
-import java.io.File
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
@@ -170,7 +171,21 @@ class MainActivity : AppCompatActivity() {
         // Initialize helpers
         googleSignInHelper = GoogleSignInHelper(this)
         drawerLayout = binding.drawerLayout
-        
+
+        // Modern back-press handling: prefer OnBackPressedDispatcher over the
+        // deprecated Activity.onBackPressed override. Closes the navigation
+        // drawer when open, otherwise falls back to the system default.
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
+
         // Initialize notification channels
         initializeNotificationChannels()
         
@@ -261,7 +276,9 @@ class MainActivity : AppCompatActivity() {
         }
         return when (item.itemId) {
             R.id.action_notifications -> {
-                val intent = Intent(this, RemindersActivity::class.java)
+                // Bell icon opens the in-app notification inbox.
+                // Reminder/notification preferences live under Settings → Reminders.
+                val intent = Intent(this, NotificationsActivity::class.java)
                 val options = ActivityOptionsCompat.makeCustomAnimation(
                     this,
                     R.anim.fade_in,
@@ -540,7 +557,7 @@ class MainActivity : AppCompatActivity() {
             openUrl("https://t.me/deenshield")
         }
         binding.btnGithub.setOnClickListener {
-            openUrl("https://github.com//deenshield")
+            openUrl("https://alhaq-initiative.org")
         }
         binding.btnInstagram.setOnClickListener {
             openUrl("https://www.instagram.com/alhaqinitiative")
@@ -741,24 +758,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun shareCrashLog(context: Context) {
-        val logFile = File(context.filesDir, "crash_log.txt")
-        if (!logFile.exists()) {
+        val errorManager = ErrorReportManager.getInstance(context)
+        val report = errorManager.exportReportsAsText()
+        if (report.contains("No crash logs found.") && report.contains("No feedback submitted.")) {
             Toast.makeText(context, "No crash logs found", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", logFile)
+        val attachmentFile = errorManager.createBundledReportFile()
+        if (attachmentFile == null) {
+            Toast.makeText(context, "Failed to prepare bundled report", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val attachmentUri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            attachmentFile
+        )
+
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "Crash Log")
-            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, "DeenShield Crash Log")
+            putExtra(Intent.EXTRA_TEXT, "Bundled crash report attached.")
+            putExtra(Intent.EXTRA_CC, SUPPORT_CC_ADDRESSES)
+            putExtra(Intent.EXTRA_STREAM, attachmentUri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
         }
 
         context.startActivity(Intent.createChooser(intent, "Share Crash Log"))
     }
     private fun sendRefreshRequest(action: String) {
-        val intent = Intent(action)
+        val intent = Intent(action).setPackage(packageName)
         sendBroadcast(intent)
     }
 //    private fun isAccessibilityServiceEnabled(serviceClass: Class<out AccessibilityService>): Boolean { // Removed old permission check
@@ -986,11 +1017,19 @@ class MainActivity : AppCompatActivity() {
                     .setTitle(getString(R.string.remove_anti_uninstall))
                     .setView(dialogRemoveAntiUninstall.root)
                     .setPositiveButton(R.string.remove) { _, _ ->
-                        if (antiUninstallInfo.getString(
-                                "password",
-                                "pass"
-                            ) == dialogRemoveAntiUninstall.password.text.toString()
-                        ) {
+                        val entered = dialogRemoveAntiUninstall.password.text.toString()
+                        val stored = antiUninstallInfo.getString("password", null)
+                        if (com.alhaq.deenshield.utils.PasswordHasher.verify(entered, stored)) {
+                            // Upgrade legacy plaintext on the way out (defense in depth: even
+                            // though we are removing protection, leave no plaintext behind).
+                            if (com.alhaq.deenshield.utils.PasswordHasher.isPlainText(stored)) {
+                                antiUninstallInfo.edit()
+                                    .putString(
+                                        "password",
+                                        com.alhaq.deenshield.utils.PasswordHasher.hash(entered)
+                                    )
+                                    .apply()
+                            }
                             antiUninstallInfo.edit().putBoolean("is_anti_uninstall_on", false)
                                 .commit()
                             sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
@@ -1050,19 +1089,21 @@ class MainActivity : AppCompatActivity() {
         val aboutMessage = """
             DeenShield v$versionName
             
-            A comprehensive digital wellbeing app designed to help you maintain focus and protect yourself from distracting content.
+            A comprehensive Islamic digital wellbeing app designed to help you maintain focus, develop healthy digital habits, and protect yourself from distracting content.
             
             Features:
-            • App Blocker
-            • View/Reel Blocker
-            • Keyword Blocker
-            • Focus Mode
-            • Usage Tracker
-            • Anti-Uninstall Protection
+            • App Blocker - Block apps by category with smart controls
+            • Reel Blocker - Limit endless scrolling on Reels, Shorts, and TikTok
+            • Keyword Blocker - Detect and block inappropriate keywords
+            • Focus Mode - Time-boxed app restrictions with tracking
+            • Notifications Inbox - View your blocking activity notifications
+            • Usage Tracker - Monitor your digital habits
+            • Anti-Uninstall Protection - Secure your protection settings
+            • Privacy Focused - All processing happens on your device
             
             Developed by Al-Haq Initiative
             
-            Privacy Focused • No Ads
+            No Ads • No Tracking • Islamic Values
         """.trimIndent()
         
         MaterialAlertDialogBuilder(this)
@@ -1301,11 +1342,14 @@ class MainActivity : AppCompatActivity() {
     
     private fun showFAQDialog() {
         val faqItems = arrayOf(
-            "How do I enable accessibility services?" to "Go to Settings → Accessibility → DeenShield, then enable the required services.",
-            "Why do my blocked apps/keywords disappear?" to "Make sure accessibility services stay enabled. Some system optimizations may disable them.",
-            "How does View Blocker work?" to "View Blocker detects and blocks Instagram Reels and YouTube Shorts while keeping other features accessible.",
+            "How do I enable accessibility services?" to "Go to Settings → Accessibility → DeenShield, then enable the required services. This is needed for all blocking features to work.",
+            "What is the Notifications bell icon?" to "The bell icon shows your notification inbox with blocking alerts, daily reports, reminders, and achievements. Tap it to view your notification history.",
+            "How does Reel Blocker work?" to "Reel Blocker detects and blocks endless scrolling on Instagram Reels, YouTube Shorts, and TikTok videos, helping you maintain focus.",
+            "Why do my blocked apps/keywords disappear?" to "Make sure accessibility services stay enabled. Some system optimizations may disable them. You can check status in Settings.",
             "Can I export my settings?" to "Yes! Go to Settings → Backup & Restore to export/import your configuration.",
-            "How do I uninstall DeenShield?" to "First disable Anti-Uninstall protection in Settings, then uninstall normally."
+            "What is Focus Mode?" to "Focus Mode lets you time-box app restrictions (e.g., block gaming apps for 2 hours). It tracks your focus sessions and shows productivity insights.",
+            "How do I disable Anti-Uninstall protection?" to "Go to Settings → Anti-Uninstall, enter your password, and tap Disable. You can then uninstall DeenShield normally.",
+            "Is DeenShield really privacy-focused?" to "Yes! All text analysis, keyword detection, and content blocking happens locally on your device. We never send your data to servers."
         )
         
         val questions = faqItems.map { it.first }.toTypedArray()
@@ -1346,15 +1390,52 @@ class MainActivity : AppCompatActivity() {
     
     private fun sendFeedbackEmail(feedback: String) {
         val account = googleSignInHelper.getLastSignedInAccount()
-        val userEmail = account?.email ?: "anonymous"
-        
-        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("contact@alhaq-initiative.org"))
-            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject))
-            putExtra(Intent.EXTRA_TEXT, "From: $userEmail\n\n$feedback")
+        val userEmail = account?.email
+        val userName = account?.displayName ?: "Anonymous"
+        val errorManager = ErrorReportManager.getInstance(this)
+
+        errorManager.saveFeedback(
+            UserFeedback(
+                category = "General",
+                message = feedback,
+                rating = 3,
+                email = userEmail,
+                deviceInfo = "${Build.MANUFACTURER} ${Build.MODEL} / Android ${Build.VERSION.RELEASE}"
+            )
+        )
+
+        val emailBody = buildString {
+            append("From: ")
+            append(userName)
+            append("\n")
+            append("Device type or model: ")
+            append("${Build.MANUFACTURER} ${Build.MODEL}")
+            append("\n")
+            append("Issue or Feedback:\n")
+            append(feedback)
         }
-        
+
+        val attachmentFile = errorManager.createBundledReportFile(prefixText = emailBody)
+        if (attachmentFile == null) {
+            Toast.makeText(this, getString(R.string.feedback_error), Toast.LENGTH_SHORT).show()
+            return
+        }
+        val attachmentUri = FileProvider.getUriForFile(
+            this,
+            "$packageName.provider",
+            attachmentFile
+        )
+
+        val emailIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject))
+            putExtra(Intent.EXTRA_TEXT, emailBody)
+            putExtra(Intent.EXTRA_CC, SUPPORT_CC_ADDRESSES)
+            putExtra(Intent.EXTRA_STREAM, attachmentUri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
+        }
+
         try {
             startActivity(Intent.createChooser(emailIntent, getString(R.string.send_feedback)))
             Toast.makeText(this, getString(R.string.feedback_sent), Toast.LENGTH_SHORT).show()
@@ -1362,15 +1443,9 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.feedback_error), Toast.LENGTH_SHORT).show()
         }
     }
-    
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
-    }
-    
+
+    // onBackPressed override removed; handled by OnBackPressedDispatcher in onCreate.
+
     private fun initializeNotificationChannels() {
         val notificationManager = com.alhaq.deenshield.utils.NotificationManager(this)
         notificationManager.createNotificationChannels()
@@ -1382,6 +1457,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
+        private val SUPPORT_CC_ADDRESSES = arrayOf(
+            "support@alhaq-initiative.org",
+            "alhaq.dst@gmail.com"
+        )
         private const val BRAND_LOGO_ASSET_PATH = "icons/Deenshield_Transparent_bg.png"
         private const val BRAND_BANNER_ASSET_PATH = "icons/Blue and Pink Trendy Gradient Technology X-Frame Banner_20251028_204729_0000.png"
     }
