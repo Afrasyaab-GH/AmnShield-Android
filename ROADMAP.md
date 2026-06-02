@@ -1,6 +1,6 @@
 # AmnShield Roadmap
 
-Last updated: 2026-05-15
+Last updated: 2026-05-29
 
 ## Recently Completed
 - Replaced bottom navigation Settings tab with Blocks dashboard tab
@@ -20,20 +20,38 @@ Last updated: 2026-05-15
   - Unified schedule/limits management experience
 - Added per-app launch tracking and automatic blocking when limit is reached
 
+## Stabilization Cycle 2026-05-29 (Blocks-First UX + Docs)
+### App UX Track (1A–1E) — Completed
+- 1A: ManageBlockSchedulesFragment — contextual dialog titles, rule counts in group confirmations, clearer destructive action labels
+- 1B: BlockScheduleAdapter — improved group badge fallback and empty-days weekly flag
+- 1C: ManageLaunchLimitsFragment — error messages improved with logging
+- 1D: HomeFragment + StatsFragment — TODO tagging for debt items, fixed misleading refresh text
+- 1E: Debug build validated (BUILD SUCCESSFUL)
+### Docs Track (2A–2C) — Completed
+- 2A: copilot-instructions.md — fixed nav model (4-tab), added unified schedule broadcast, updated date
+- 2A: amnshield-mobile.instructions.md — added last-verified date and plan cross-link
+- 2B: TESTING_GUIDE.md — fixed nav tab name, added Test 18 / 18b for Blocks Dashboard and Schedule Group actions
+- 2C: ROADMAP.md updated (this entry)
+
 ## Current Stabilization Goals
-- Expand end-to-end tests for Blocks dashboard and launch-limit flows
-- Improve UX copy consistency across management screens
-- Validate migration behavior for users upgrading from older nav layouts
+- [x] Blocks dashboard UX clarity improvements
+- [x] Docs baseline sync (nav model, broadcasts, test scenarios)
+- [ ] Expand end-to-end tests for schedules/groups and launch-limit flows on device
+- [ ] Validate migration behavior for users upgrading from older nav layouts
 
 ## Next Planned Improvements
 - Add richer active-block diagnostics on Blocks dashboard (last trigger time, source)
 - Add optional quick actions per card (edit/delete shortcuts)
 - Add clearer premium-gated affordances on blocked actions
 - Improve schedule and launch-limit conflict resolution hints
+- Add optional undo snackbar for destructive schedule actions (single/group)
+- Move keyword-pack prefs reading into SavedPreferencesLoader (flagged TODO)
+- Surface actionable enable prompt when accessibility service is disabled (flagged TODO)
 
 ## Release Readiness Checklist
-- [ ] Debug build passes
+- [x] Debug build passes
 - [ ] Release APK build passes
 - [ ] Release AAB build passes
-- [ ] Manual sanity checks complete (navigation + blocks flows)
+- [ ] Manual sanity checks complete (navigation + blocks/schedules/groups flows)
 - [ ] Regression checks complete for existing feature configs
+

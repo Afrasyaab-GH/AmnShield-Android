@@ -1,8 +1,8 @@
 package com.alhaq.deenshield.blockers
 
 import android.view.accessibility.AccessibilityNodeInfo
+import com.alhaq.deenshield.utils.ScheduleUtils
 import com.alhaq.deenshield.utils.TimeTools
-import java.util.Calendar
 
 class ReelBlocker : BaseBlocker() {
 
@@ -287,23 +287,17 @@ class ReelBlocker : BaseBlocker() {
     }
 
     private fun isCheatHourActive(): Boolean {
-        val currentTime = Calendar.getInstance()
-        val currentHour = currentTime.get(Calendar.HOUR_OF_DAY)
-        val currentMinute = currentTime.get(Calendar.MINUTE)
-
-        val currentMinutes = TimeTools.convertToMinutesFromMidnight(currentHour, currentMinute)
-
         if (cheatMinuteStartTime == null || cheatMinutesEndTime == null ||
             cheatMinuteStartTime == -1 || cheatMinutesEndTime == -1
         ) {
             return false
         }
 
-        return if (cheatMinuteStartTime!! <= cheatMinutesEndTime!!) {
-            currentMinutes in cheatMinuteStartTime!!..cheatMinutesEndTime!!
-        } else {
-            currentMinutes in cheatMinuteStartTime!!..1439 || currentMinutes in 0..cheatMinutesEndTime!!
-        }
+        return ScheduleUtils.isDailyWindowActive(
+            cheatMinuteStartTime!!,
+            cheatMinutesEndTime!!,
+            System.currentTimeMillis()
+        )
     }
 
     data class ReelBlockerResult(

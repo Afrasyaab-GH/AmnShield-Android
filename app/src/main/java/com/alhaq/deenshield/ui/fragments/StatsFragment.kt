@@ -18,6 +18,7 @@ import com.alhaq.deenshield.ui.activity.UsageMetricsActivity
 import com.alhaq.deenshield.ui.fragments.usage.AllAppsUsageFragment
 import com.alhaq.deenshield.utils.BlockingStatsManager
 import com.alhaq.deenshield.utils.UsageStatsHelper
+import com.alhaq.deenshield.utils.SavedPreferencesLoader
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +31,7 @@ class StatsFragment : Fragment() {
     private var _binding: FragmentStatsBinding? = null
     private val binding get() = _binding!!
     private val premiumManager by lazy { PremiumManager.getInstance(requireContext()) }
+    private val savedPreferencesLoader by lazy { SavedPreferencesLoader(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -126,8 +128,6 @@ class StatsFragment : Fragment() {
                         val totalTime = statsList.sumOf { it.totalTime }
 
                         // Get yesterday's reels count for comparison
-                        // TODO: Move SavedPreferencesLoader to a lazy field (consistent with HomeFragment pattern)
-                        val savedPreferencesLoader = com.alhaq.deenshield.utils.SavedPreferencesLoader(ctx)
                         val reelsData = savedPreferencesLoader.getReelsScrolled()
                         val todayDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
                         val reelsToday = reelsData[todayDate] ?: 0

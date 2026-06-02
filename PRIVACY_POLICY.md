@@ -1,6 +1,6 @@
 # Privacy Policy for AmnShield
 
-**Last Updated: 2026-04-25**
+**Last Updated: 2026-05-15** · _Policy last reviewed for accuracy: 2026-05-29_
 
 ## 1. Introduction
 
@@ -16,6 +16,7 @@ To provide our features, AmnShield collects information in the following ways:
 
 *   **Account Information:** When you choose to sign in with your Google Account, we receive your basic profile information, such as your name and email address, as provided by Google. This is used solely for authentication and managing premium features.
 *   **Configuration Data:** You provide us with your preferences and settings, such as lists of blocked applications, blocked keywords, focus mode configurations, and other settings you configure within the app. This data is stored locally on your device.
+*   **Schedule and Limit Rules:** App block schedules, grouped unified schedules, and app launch-limit rules are stored locally on your device to enforce your selected controls.
 
 ### b. Information Collected Automatically Through App Usage
 
@@ -73,6 +74,7 @@ We require certain permissions to provide the features of AmnShield. Here is a d
 We use the information we collect solely to provide and improve the functionality of the AmnShield app.
 
 *   **To Provide Core Features:** Your configuration data and the data from the Accessibility Service are used to make the app, view, and keyword blockers work as you've configured them.
+*   **To Enforce Scheduled Controls:** Locally stored schedule and launch-limit data are used to apply time-based blocking, feature toggles, and grouped management actions you configure.
 *   **To Display Your Stats:** App usage data is used to generate the charts and statistics you see on the "Stats" screen.
 *   **To Authenticate and Manage Your Account:** Your Google Account information is used to sign you in and verify your premium status.
 *   **For On-Device Smart Features:** Text and image data are used locally by the on-device machine learning models to provide smart content moderation.

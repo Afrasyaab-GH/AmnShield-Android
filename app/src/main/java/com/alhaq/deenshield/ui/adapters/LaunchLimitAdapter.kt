@@ -41,7 +41,6 @@ class LaunchLimitAdapter(
             try {
                 val appInfo = context.packageManager.getApplicationInfo(rule.packageName, 0)
                 val appName = appInfo.loadLabel(context.packageManager).toString()
-                val appIcon = appInfo.loadIcon(context.packageManager)
                 binding.appName.text = appName
             } catch (e: Exception) {
                 binding.appName.text = rule.packageName
@@ -49,18 +48,17 @@ class LaunchLimitAdapter(
 
             binding.limitDescription.text = rule.getDescription()
 
-            // Get current launch count
+            // Get current launch count and drive progress
             val savedPrefs = SavedPreferencesLoader(context)
             val currentCount = savedPrefs.getCurrentLaunchCount(rule.packageName, rule)
-            binding.currentCount.text = "Current: $currentCount / ${rule.maxLaunches}"
+            val maxLaunches = rule.maxLaunches.coerceAtLeast(1)
+            val progressPercent = ((currentCount.toFloat() / maxLaunches) * 100).toInt().coerceIn(0, 100)
 
-            binding.btnEdit.setOnClickListener {
-                onEdit(rule)
-            }
+            binding.currentCount.text = "$currentCount / $maxLaunches"
+            binding.progressLaunchUsage.progress = progressPercent
 
-            binding.btnDelete.setOnClickListener {
-                onDelete(rule)
-            }
+            binding.btnEdit.setOnClickListener { onEdit(rule) }
+            binding.btnDelete.setOnClickListener { onDelete(rule) }
         }
     }
 

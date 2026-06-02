@@ -909,6 +909,16 @@ class SavedPreferencesLoader(private val context: Context) {
         return calendar.timeInMillis
     }
 
+    fun isKeywordBlockerAdultPackEnabled(): Boolean {
+        val sharedPreferences = context.getSharedPreferences("keyword_blocker_packs", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean("adult_blocker", false)
+    }
+
+    fun setKeywordBlockerAdultPackEnabled(enabled: Boolean) {
+        val sharedPreferences = context.getSharedPreferences("keyword_blocker_packs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("adult_blocker", enabled).apply()
+    }
+
     /**
      * Data class to track launch count with timestamp for period-based reset logic
      */

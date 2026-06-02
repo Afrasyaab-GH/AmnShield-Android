@@ -64,8 +64,7 @@ class BlocksFragment : BaseFeatureFragment() {
         updateStatus(binding.chipAppBlockerStatus, appActive, if (appBlockedApps > 0) "$appBlockedApps apps" else getString(R.string.off))
 
         val keywordCount = blocksLoader.loadBlockedKeywords().size
-        val keywordPackPrefs = requireContext().getSharedPreferences("keyword_blocker_packs", android.content.Context.MODE_PRIVATE)
-        val adultPackEnabled = keywordPackPrefs.getBoolean("adult_blocker", false)
+        val adultPackEnabled = blocksLoader.isKeywordBlockerAdultPackEnabled()
         val keywordActive = blocksLoader.isKeywordBlockerFeatureEnabled() && (keywordCount > 0 || adultPackEnabled) && serviceEnabled
         val keywordLabel = if (keywordCount > 0) "$keywordCount keywords" else if (adultPackEnabled) "Adult pack" else getString(R.string.off)
         updateStatus(binding.chipKeywordBlockerStatus, keywordActive, keywordLabel)
@@ -83,33 +82,63 @@ class BlocksFragment : BaseFeatureFragment() {
         updateCountStatus(binding.chipLaunchLimitsStatus, launchLimitCount, "${launchLimitCount} limits")
 
         val activeCount = listOf(appActive, keywordActive, focusActive, cheatCount > 0, scheduleCount > 0, launchLimitCount > 0).count { it }
-        binding.txtActiveSummary.text = getString(R.string.active_blocks)
-        binding.txtActiveCount.text = "$activeCount active"
+        
+        context?.let { ctx ->
+            if (activeCount > 0) {
+                // Secure Green Active State
+                binding.cardActiveStatus.setCardBackgroundColor(ContextCompat.getColorStateList(ctx, R.color.emerald_primaryContainer))
+                binding.cardActiveStatus.strokeColor = ContextCompat.getColor(ctx, R.color.emerald_primary)
+                binding.txtActiveSummary.text = "Blocking Active"
+                binding.txtActiveSummary.setTextColor(ContextCompat.getColor(ctx, R.color.emerald_onPrimaryContainer))
+                binding.txtActiveCount.text = "$activeCount active protection rules running"
+                binding.txtActiveCount.setTextColor(ContextCompat.getColor(ctx, R.color.emerald_onPrimaryContainer))
+                
+                binding.cardLockContainer.setCardBackgroundColor(ContextCompat.getColorStateList(ctx, R.color.emerald_primary))
+                binding.imgLockIcon.imageTintList = ContextCompat.getColorStateList(ctx, R.color.white)
+            } else {
+                // Inactive Grey State
+                binding.cardActiveStatus.setCardBackgroundColor(ContextCompat.getColorStateList(ctx, R.color.md_theme_surfaceContainerHigh))
+                binding.cardActiveStatus.strokeColor = ContextCompat.getColor(ctx, R.color.md_theme_outlineVariant)
+                binding.txtActiveSummary.text = "No Active Blocks"
+                binding.txtActiveSummary.setTextColor(ContextCompat.getColor(ctx, R.color.md_theme_onSurface))
+                binding.txtActiveCount.text = "Enable protection features below"
+                binding.txtActiveCount.setTextColor(ContextCompat.getColor(ctx, R.color.md_theme_onSurfaceVariant))
+                
+                binding.cardLockContainer.setCardBackgroundColor(ContextCompat.getColorStateList(ctx, R.color.md_theme_outline))
+                binding.imgLockIcon.imageTintList = ContextCompat.getColorStateList(ctx, R.color.white)
+            }
+        }
     }
 
     private fun updateStatus(chip: com.google.android.material.chip.Chip, isEnabled: Boolean, label: String) {
         chip.text = label
+        val ctx = context ?: return
         if (isEnabled) {
-            chip.chipBackgroundColor = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_primaryContainer) }
+            chip.chipBackgroundColor = ContextCompat.getColorStateList(ctx, R.color.emerald_primaryContainer)
+            chip.setTextColor(ContextCompat.getColor(ctx, R.color.emerald_primary))
             chip.setChipIconResource(R.drawable.baseline_done_24)
-            chip.chipIconTint = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_primary) }
+            chip.chipIconTint = ContextCompat.getColorStateList(ctx, R.color.emerald_primary)
         } else {
-            chip.chipBackgroundColor = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_errorContainer) }
+            chip.chipBackgroundColor = ContextCompat.getColorStateList(ctx, R.color.md_theme_surfaceVariant)
+            chip.setTextColor(ContextCompat.getColor(ctx, R.color.md_theme_onSurfaceVariant))
             chip.setChipIconResource(R.drawable.baseline_stop_24)
-            chip.chipIconTint = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_onErrorContainer) }
+            chip.chipIconTint = ContextCompat.getColorStateList(ctx, R.color.md_theme_onSurfaceVariant)
         }
     }
 
     private fun updateCountStatus(chip: com.google.android.material.chip.Chip, count: Int, label: String) {
         chip.text = label
+        val ctx = context ?: return
         if (count > 0) {
-            chip.chipBackgroundColor = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_secondaryContainer) }
+            chip.chipBackgroundColor = ContextCompat.getColorStateList(ctx, R.color.md_theme_secondaryContainer)
+            chip.setTextColor(ContextCompat.getColor(ctx, R.color.md_theme_secondary))
             chip.setChipIconResource(R.drawable.baseline_done_24)
-            chip.chipIconTint = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_secondary) }
+            chip.chipIconTint = ContextCompat.getColorStateList(ctx, R.color.md_theme_secondary)
         } else {
-            chip.chipBackgroundColor = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_errorContainer) }
+            chip.chipBackgroundColor = ContextCompat.getColorStateList(ctx, R.color.md_theme_surfaceVariant)
+            chip.setTextColor(ContextCompat.getColor(ctx, R.color.md_theme_onSurfaceVariant))
             chip.setChipIconResource(R.drawable.baseline_stop_24)
-            chip.chipIconTint = context?.let { ContextCompat.getColorStateList(it, R.color.md_theme_onErrorContainer) }
+            chip.chipIconTint = ContextCompat.getColorStateList(ctx, R.color.md_theme_onSurfaceVariant)
         }
     }
 

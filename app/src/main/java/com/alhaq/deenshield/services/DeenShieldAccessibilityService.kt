@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.content.edit
@@ -26,6 +25,7 @@ import com.alhaq.deenshield.premium.PremiumManager
 import com.alhaq.deenshield.ui.activity.MainActivity
 import com.alhaq.deenshield.ui.activity.WarningActivity
 import com.alhaq.deenshield.utils.BlockingStatsManager
+import com.alhaq.deenshield.utils.ScheduleUtils
 import com.alhaq.deenshield.utils.TimeTools
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -69,7 +69,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
 
     private var appBlockerWarningConfig = MainActivity.WarningData()
     private var viewBlockerWarningConfig = MainActivity.WarningData()
-    private var lastEventTimeStamp = 0L
 
     // Anti-uninstall protection state
     private var isAntiUninstallOn = false
@@ -86,7 +85,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
     private var lastPasswordVerificationTime = 0L
     private val PASSWORD_VERIFICATION_COOLDOWN = 5 * 60 * 1000L
     private var isPasswordVerified = false
-    private var currentProtectionSession: String? = null
     private var lastReelCountRefreshTime = 0L
     private var lastUnifiedScheduleEvalTime = 0L
     private var cachedReelsScrolledToday = 0
@@ -135,8 +133,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
             addAction(INTENT_ACTION_PASSWORD_VERIFIED)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Internal-only broadcasts; never expose to other apps to prevent
-            // remote bypass of password verification or blocker state.
             registerReceiver(refreshReceiver, filter, RECEIVER_NOT_EXPORTED)
         } else {
             registerReceiver(refreshReceiver, filter)
@@ -162,7 +158,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
 
             evaluateUnifiedFeatureSchedulesIfNeeded()
 
-            // Track app launches for launch limit feature
             if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
                 trackAppLaunch(packageName)
                 cachedDefaultLauncher = getDefaultLauncherPackage()
@@ -205,8 +200,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
             val isFocusBlockAllExSelectedActive = isFocusModeActive && focusModeBlocker.focusModeData.modeType == Constants.FOCUS_MODE_BLOCK_ALL_EX_SELECTED
 
             if (!isFocusBlockAllExSelectedActive) {
-                if (isPremiumUser && savedPreferencesLoader.isAppBlockerFeatureEnabled() && 
-                    (appBlocker.blockedApps.isNotEmpty() || savedPreferencesLoader.loadAppLaunchLimitRules().isNotEmpty())) {
+                if (isPremiumUser && savedPreferencesLoader.isAppBlockerFeatureEnabled()) {
                     val appBlockerResult = appBlocker.doesAppNeedToBeBlocked(packageName, savedPreferencesLoader)
                     if (appBlockerResult.isBlocked) {
                         blockingStatsManager.recordAppBlock(packageName, "Blocked by App Blocker")
@@ -313,20 +307,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
         startActivity(dialogIntent)
     }
 
-    private fun handleViewBlockerResult(result: ViewBlocker.ViewBlockerResult?) {
-        if (result == null || !result.isBlocked) return
-
-        pressBack()
-
-        if (viewBlockerWarningConfig.isWarningDialogHidden) return
-        val dialogIntent = Intent(this, WarningActivity::class.java)
-        dialogIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        dialogIntent.putExtra("mode", Constants.WARNING_SCREEN_MODE_VIEW_BLOCKER)
-        dialogIntent.putExtra("result_id", result.viewId)
-        dialogIntent.putExtra("is_press_home", result.requestHomePressInstead)
-        startActivity(dialogIntent)
-    }
-
     private val refreshReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
@@ -370,7 +350,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
                 INTENT_ACTION_PASSWORD_VERIFIED -> {
                     isPasswordVerified = true
                     lastPasswordVerificationTime = System.currentTimeMillis()
-                    android.util.Log.d("DeenShield", "Password verified, 5-minute cooldown started")
                 }
             }
         }
@@ -383,10 +362,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
         appBlocker.refreshCheatHoursData(savedPreferencesLoader.loadAppBlockerCheatHoursList())
         appBlocker.refreshScheduleRules(savedPreferencesLoader.loadAppBlockerScheduleRules())
         savedPreferencesLoader.saveAppBlockerCooldownData(appBlocker.getCooldownSnapshot())
-
-        val cheatHours = getSharedPreferences("cheat_hours", Context.MODE_PRIVATE)
-        appBlocker.cheatMinuteStartTime = cheatHours.getInt("app_blocker_start_time", -1)
-        appBlocker.cheatMinutesEndTime = cheatHours.getInt("app_blocker_end_time", -1)
     }
 
     private fun setupKeywordBlocker() {
@@ -422,8 +397,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
     }
 
     private fun setupViewBlocker() {
-        // ViewBlocker no longer detects reels/shorts (handled by ReelBlocker), but
-        // we still load its warning config + cooldown snapshot for backward compat.
         viewBlockerWarningConfig = savedPreferencesLoader.loadViewBlockerWarningInfo()
         viewBlocker.restoreCooldowns(savedPreferencesLoader.loadViewBlockerCooldownData())
         savedPreferencesLoader.saveViewBlockerCooldownData(viewBlocker.getCooldownSnapshot())
@@ -445,7 +418,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
         reelBlocker.cheatMinuteStartTime = cheatHoursPrefs.getInt("view_blocker_start_time", -1)
         reelBlocker.cheatMinutesEndTime = cheatHoursPrefs.getInt("view_blocker_end_time", -1)
 
-        // Per-platform toggles + browser support.
         reelBlocker.isYoutubeEnabled = reelBlockerPrefs.getBoolean("is_youtube_enabled", true)
         reelBlocker.isInstagramEnabled = reelBlockerPrefs.getBoolean("is_instagram_enabled", true)
         reelBlocker.isTiktokEnabled = reelBlockerPrefs.getBoolean("is_tiktok_enabled", true)
@@ -578,19 +550,20 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
             val targetRules = rules.filter { it.targets.contains(target) }
             if (targetRules.isEmpty()) return@forEach
 
-            val hasActiveCheat = targetRules.any {
+            val activeCheat = targetRules.firstOrNull {
                 it.type == UnifiedFeatureScheduleRule.RuleType.CHEAT && isUnifiedRuleActive(it, now)
             }
-            val hasActiveBlock = targetRules.any {
+            val activeBlock = targetRules.firstOrNull {
                 it.type == UnifiedFeatureScheduleRule.RuleType.BLOCK && isUnifiedRuleActive(it, now)
             }
 
-            val desiredState = when {
-                hasActiveCheat -> false
-                hasActiveBlock -> true
-                else -> false
+            // Priority: Active Cheat > Active Block > Manual User Setting
+            when {
+                activeCheat != null -> applyUnifiedFeatureState(target, false)
+                activeBlock != null -> applyUnifiedFeatureState(target, true)
+                // If no schedule is active, we don't change the state.
+                // This lets the user's manual toggle in the UI remain in control.
             }
-            applyUnifiedFeatureState(target, desiredState)
         }
     }
 
@@ -634,50 +607,11 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
             UnifiedFeatureScheduleRule.Recurrence.ALWAYS -> true
             UnifiedFeatureScheduleRule.Recurrence.HOURLY -> rule.activeUntilMillis > nowMillis
             UnifiedFeatureScheduleRule.Recurrence.DAILY -> {
-                isDailyLikeWindowActive(rule.startMinute, rule.endMinute, nowMillis)
+                ScheduleUtils.isDailyWindowActive(rule.startMinute, rule.endMinute, nowMillis)
             }
-
             UnifiedFeatureScheduleRule.Recurrence.WEEKLY -> {
-                if (rule.selectedDays.isEmpty()) {
-                    false
-                } else {
-                    isWeeklyWindowActive(rule.startMinute, rule.endMinute, rule.selectedDays, nowMillis)
-                }
+                ScheduleUtils.isWeeklyWindowActive(rule.startMinute, rule.endMinute, rule.selectedDays, nowMillis)
             }
-        }
-    }
-
-    private fun isDailyLikeWindowActive(startMinutes: Int, endMinutes: Int, nowMillis: Long): Boolean {
-        if (startMinutes == endMinutes) return false
-
-        val now = Calendar.getInstance().apply { timeInMillis = nowMillis }
-        val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
-
-        return if (startMinutes < endMinutes) {
-            currentMinutes in startMinutes until endMinutes
-        } else {
-            currentMinutes >= startMinutes || currentMinutes < endMinutes
-        }
-    }
-
-    private fun isWeeklyWindowActive(
-        startMinutes: Int,
-        endMinutes: Int,
-        selectedDays: Set<Int>,
-        nowMillis: Long
-    ): Boolean {
-        if (startMinutes == endMinutes) return false
-
-        val now = Calendar.getInstance().apply { timeInMillis = nowMillis }
-        val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
-        val today = now.get(Calendar.DAY_OF_WEEK)
-        val yesterday = if (today == Calendar.SUNDAY) Calendar.SATURDAY else today - 1
-
-        return if (startMinutes < endMinutes) {
-            selectedDays.contains(today) && currentMinutes in startMinutes until endMinutes
-        } else {
-            (selectedDays.contains(today) && currentMinutes >= startMinutes) ||
-                (selectedDays.contains(yesterday) && currentMinutes < endMinutes)
         }
     }
 
@@ -715,7 +649,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
 
                 if (currentTime - lastBlockTime > blockCooldown) {
                     lastBlockTime = currentTime
-                    currentProtectionSession = "settings_" + currentTime
                     handleAntiUninstallAttempt()
                 }
             }
@@ -753,7 +686,6 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
 
                 if (currentTime - lastBlockTime > blockCooldown) {
                     lastBlockTime = currentTime
-                    currentProtectionSession = "launcher_" + currentTime
                     handleAntiUninstallAttempt()
                 }
             }

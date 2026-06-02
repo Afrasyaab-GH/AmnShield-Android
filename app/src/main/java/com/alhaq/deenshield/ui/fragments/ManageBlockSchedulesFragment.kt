@@ -140,7 +140,7 @@ class ManageBlockSchedulesFragment : Fragment() {
         if (schedules.isEmpty()) {
             binding.emptyState.visibility = View.VISIBLE
             binding.schedulesList.visibility = View.GONE
-            binding.emptyStateText.text = "No block schedules yet.\n\nCreate one from App Blocker, launch limits, or a recommendation card."
+            binding.emptyStateText.text = "No block schedules yet.\n\nTap 'Add Rule' to create a scheduled block window."
         } else {
             binding.emptyState.visibility = View.GONE
             binding.schedulesList.visibility = View.VISIBLE
@@ -158,6 +158,15 @@ class ManageBlockSchedulesFragment : Fragment() {
             binding.launchLimitsList.visibility = View.VISIBLE
             launchLimitAdapter?.submitList(launchLimits)
         }
+
+        // Update summary stats header
+        binding.txtScheduleCount.text = schedules.size.toString()
+        binding.txtLimitsCount.text = launchLimits.size.toString()
+        val totalRules = schedules.size + launchLimits.size
+        binding.txtScheduleSubtitle.text = if (totalRules > 0)
+            "$totalRules active rules protecting you"
+        else
+            "Schedules & Launch Limits"
     }
 
     private fun showUnifiedScheduleEntryDialog() {

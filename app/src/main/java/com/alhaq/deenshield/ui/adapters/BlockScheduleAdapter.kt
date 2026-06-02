@@ -3,9 +3,11 @@ package com.alhaq.deenshield.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.alhaq.deenshield.R
 import com.alhaq.deenshield.data.blockers.AppBlockScheduleRule
 import com.alhaq.deenshield.databinding.BlockScheduleItemBinding
 import java.text.SimpleDateFormat
@@ -24,7 +26,15 @@ class BlockScheduleAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(rule: AppBlockScheduleRule) {
+            val ctx = binding.root.context
             binding.scheduleTitle.text = rule.title
+
+            // Color the type indicator circle: green for CHEAT windows, primary for BLOCK rules
+            val isCheat = rule.type == AppBlockScheduleRule.RuleType.CHEAT
+            val circleColor = if (isCheat) R.color.emerald_primaryContainer else R.color.md_theme_primaryContainer
+            val iconColor  = if (isCheat) R.color.emerald_primary else R.color.md_theme_primary
+            binding.cardTypeIndicator.setCardBackgroundColor(ContextCompat.getColorStateList(ctx, circleColor))
+            binding.imgTypeIcon.imageTintList = ContextCompat.getColorStateList(ctx, iconColor)
 
             if (rule.groupId.isNullOrBlank()) {
                 binding.scheduleGroupBadge.visibility = View.GONE
@@ -50,7 +60,7 @@ class BlockScheduleAdapter(
                     val startMin = rule.startMinute % 60
                     val endHour = rule.endMinute / 60
                     val endMin = rule.endMinute % 60
-                    String.format("%02d:%02d - %02d:%02d", startHour, startMin, endHour, endMin)
+                    String.format("%02d:%02d – %02d:%02d", startHour, startMin, endHour, endMin)
                 }
             }
             binding.scheduleTimeWindow.text = timeWindow
@@ -76,13 +86,8 @@ class BlockScheduleAdapter(
                 AppBlockScheduleRule.Recurrence.ALWAYS -> "Always active"
             }
 
-            binding.btnEdit.setOnClickListener {
-                onEdit(rule)
-            }
-
-            binding.btnDelete.setOnClickListener {
-                onDelete(rule)
-            }
+            binding.btnEdit.setOnClickListener { onEdit(rule) }
+            binding.btnDelete.setOnClickListener { onDelete(rule) }
         }
     }
 
