@@ -7,9 +7,10 @@ import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
 
 object LicenseValidator {
-    // NIST P-256 (secp256r1) Public Key in X.509 format (Base64)
-    // We will generate this using our test suite and replace this placeholder.
-    private const val PUBLIC_KEY_BASE64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7EFR1qxpfZTMeR52M1+04+tPb6ItmVmhPbRCIJYje3jtglTdBbcct+/xvc1D1NZtXuvSb4Egtdqm/EJ6H67fEA=="
+    // NIST P-256 (secp256r1) Public Key keyring in X.509 format (Base64)
+    private val KEYRING = mapOf(
+        1 to "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7EFR1qxpfZTMeR52M1+04+tPb6ItmVmhPbRCIJYje3jtglTdBbcct+/xvc1D1NZtXuvSb4Egtdqm/EJ6H67fEA=="
+    )
 
     fun verifyLicense(licenseString: String): LicensePayload? {
         try {
@@ -31,8 +32,11 @@ object LicenseValidator {
                 return null
             }
 
+            // Retrieve the public key corresponding to the payload schema version
+            val publicKeyBase64 = KEYRING[payload.version] ?: return null
+
             // Verify signature
-            val publicKeyBytes = Base64.getDecoder().decode(PUBLIC_KEY_BASE64)
+            val publicKeyBytes = Base64.getDecoder().decode(publicKeyBase64)
             val keySpec = X509EncodedKeySpec(publicKeyBytes)
             val keyFactory = KeyFactory.getInstance("EC")
             val publicKey = keyFactory.generatePublic(keySpec)
@@ -50,9 +54,7 @@ object LicenseValidator {
         return null
     }
 
-    // A helper method to update the public key in tests or via reflection if needed
-    // but in production it is hardcoded.
-    var debugPublicKey: String
-        get() = PUBLIC_KEY_BASE64
-        set(value) {}
+    // Return the default public key for debug and backward compatibility
+    val debugPublicKey: String
+        get() = KEYRING[1] ?: ""
 }

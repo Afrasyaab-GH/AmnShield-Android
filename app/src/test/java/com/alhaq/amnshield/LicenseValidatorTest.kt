@@ -91,6 +91,20 @@ class LicenseValidatorTest {
         assertNull("Tampered payloads must fail signature verification", LicenseValidator.verifyLicense(tamperedLicenseString))
     }
 
+    @Test
+    fun testLicenseVerificationInvalidVersion() {
+        val email = "user@alhaq.org"
+        val expires = System.currentTimeMillis() + 1000 * 60 * 60
+        val type = "lifetime"
+        // Version 2 is NOT present in the keyring yet!
+        val payload = LicensePayload(email, type, expires, 2)
+
+        val licenseString = generateLicenseString(payload)
+        val verifiedPayload = LicenseValidator.verifyLicense(licenseString)
+
+        assertNull("Payload with unsupported version must return null", verifiedPayload)
+    }
+
     private fun generateLicenseString(payload: LicensePayload): String {
         val gson = Gson()
         val payloadJson = gson.toJson(payload)
