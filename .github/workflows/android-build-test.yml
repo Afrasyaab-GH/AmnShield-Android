@@ -2,9 +2,9 @@ name: Android Build & Test CI
 
 on:
   push:
-    branches: [ main, Test/Beta, Rebranding/Beta ]
+    branches: [ main, Test/Pre-Production ]
   pull_request:
-    branches: [ main, Test/Beta, Rebranding/Beta ]
+    branches: [ main, Test/Pre-Production ]
 
 jobs:
   build:
