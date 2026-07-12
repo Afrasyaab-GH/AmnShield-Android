@@ -58,6 +58,13 @@ android {
             isDebuggable = true
             isMinifyEnabled = false
         }
+
+        create("staging") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-STAGING"
+            matchingFallbacks.add("debug")
+        }
         
         release {
             applicationIdSuffix = ""
