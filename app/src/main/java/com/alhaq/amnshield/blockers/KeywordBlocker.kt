@@ -143,7 +143,7 @@ class KeywordBlocker(val service: AccessibilityService) : BaseBlocker() {
         val packageName = event.packageName?.toString()
         val rootPackage = rootNode.packageName?.toString()
         
-        // Never let keyword blocker act on DeenShield itself
+        // Never let keyword blocker act on AmnShield itself
         if ((packageName != null && packageName.equals("com.alhaq.amnshield", ignoreCase = true)) ||
             (rootPackage != null && rootPackage.equals("com.alhaq.amnshield", ignoreCase = true))) {
             return KeywordBlockerResult()

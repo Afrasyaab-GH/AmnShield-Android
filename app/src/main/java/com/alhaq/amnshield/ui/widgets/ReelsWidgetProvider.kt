@@ -17,7 +17,7 @@ class ReelsWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val TAG = "ReelsWidgetProvider"
-        private const val ACTION_WIDGET_REFRESH = ".deenshield.reels.WIDGET_REFRESH"
+        private const val ACTION_WIDGET_REFRESH = ".amnshield.reels.WIDGET_REFRESH"
     }
 
     override fun onUpdate(

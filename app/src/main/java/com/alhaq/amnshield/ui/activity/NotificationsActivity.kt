@@ -16,7 +16,7 @@ import com.alhaq.amnshield.utils.NotificationInboxStore
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 /**
- * Inbox screen for in-app DeenShield notifications.
+ * Inbox screen for in-app AmnShield notifications.
  *
  * The toolbar bell icon in [MainActivity] now opens this screen so users see
  * their actual notification history. Reminder/notification preferences live

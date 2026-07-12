@@ -19,7 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.FragmentHomeBinding
 import com.alhaq.amnshield.receivers.AdminReceiver
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 import com.alhaq.amnshield.premium.PremiumManager
 
@@ -121,7 +121,7 @@ class HomeFragment : Fragment() {
     private fun updateServiceStatus() {
         context?.let { ctx ->
             // Check if the main accessibility service is enabled
-            val isMainServiceEnabled = isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)
+            val isMainServiceEnabled = isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)
             val isPremiumUser = premiumManager.isPremium()
             
             // Update Focus Mode status - check if a focus session is actually running
@@ -176,7 +176,7 @@ class HomeFragment : Fragment() {
                 if (serviceSnackbar == null) {
                     serviceSnackbar = Snackbar.make(
                         binding.root,
-                        "DeenShield service is disabled. Please enable it for full protection.",
+                        "AmnShield service is disabled. Please enable it for full protection.",
                         Snackbar.LENGTH_INDEFINITE
                     ).setAction("Enable") {
                         openAccessibilitySettings()

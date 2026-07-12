@@ -252,7 +252,7 @@ class AntiUninstallPasswordActivity : AppCompatActivity() {
 
     private fun sendPasswordVerifiedBroadcast() {
         val intent = android.content.Intent(
-            com.alhaq.amnshield.services.DeenShieldAccessibilityService.INTENT_ACTION_PASSWORD_VERIFIED
+            com.alhaq.amnshield.services.AmnShieldAccessibilityService.INTENT_ACTION_PASSWORD_VERIFIED
         ).setPackage(packageName)
         sendBroadcast(intent)
     }

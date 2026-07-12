@@ -31,7 +31,7 @@ class FocusModeBlocker : BaseBlocker() {
             "com.google.android.contacts",
             "com.samsung.android.dialer",
             "com.samsung.android.contacts",
-            "com.alhaq.amnshield" // DeenShield itself
+            "com.alhaq.amnshield" // AmnShield itself
         )
     }
 

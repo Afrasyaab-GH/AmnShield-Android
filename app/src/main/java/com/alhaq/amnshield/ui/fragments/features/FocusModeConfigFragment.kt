@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.FragmentFocusModeConfigBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.activity.SelectAppsActivity
 import com.alhaq.amnshield.ui.activity.TimedActionActivity
 import com.alhaq.amnshield.ui.dialogs.StartFocusMode
@@ -35,7 +35,7 @@ class FocusModeConfigFragment : BaseFeatureFragment() {
             selectedApps?.let {
                 savedPreferencesLoader.saveFocusModeSelectedApps(it)
                 updateSelectedAppsCount(it.size)
-                val intent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
+                val intent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
                 intent.setPackage(requireContext().packageName)
                 requireContext().sendBroadcast(intent)
             }
@@ -73,13 +73,13 @@ class FocusModeConfigFragment : BaseFeatureFragment() {
     }
 
     private fun checkServiceStatus() {
-        if (!isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)) {
+        if (!isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)) {
             binding.statusCard.visibility = View.VISIBLE
             binding.configContainer.visibility = View.GONE
-            binding.statusMessage.text = "Please enable DeenShield accessibility service to continue."
+            binding.statusMessage.text = "Please enable AmnShield accessibility service to continue."
             binding.btnStatusAction.text = getString(R.string.open_accessibility_settings)
             binding.btnStatusAction.setOnClickListener {
-                showAccessibilityInfoDialog("DeenShield Accessibility Service", DeenShieldAccessibilityService::class.java)
+                showAccessibilityInfoDialog("AmnShield Accessibility Service", AmnShieldAccessibilityService::class.java)
             }
         } else {
             binding.statusCard.visibility = View.GONE

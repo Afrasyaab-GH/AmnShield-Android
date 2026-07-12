@@ -119,7 +119,7 @@ class NotificationHelper(private val context: Context) {
         
         val notification = NotificationCompat.Builder(context, CHANNEL_ID_REPORTS)
             .setSmallIcon(R.drawable.ic_logo_mini)
-            .setContentTitle("Daily DeenShield Report • $shortDate")
+            .setContentTitle("Daily AmnShield Report • $shortDate")
             .setContentText("Tap to review your blocking, focus, and reels summary")
             .setStyle(NotificationCompat.BigTextStyle().bigText(summaryText))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -132,7 +132,7 @@ class NotificationHelper(private val context: Context) {
                 notify(NOTIFICATION_ID_DAILY_REPORT, notification)
                 NotificationInboxStore.add(
                     context,
-                    title = "Daily DeenShield Report • $shortDate",
+                    title = "Daily AmnShield Report • $shortDate",
                     message = "Tap to review your blocking, focus, and reels summary",
                     category = NotificationInboxStore.Category.DAILY_REPORT
                 )

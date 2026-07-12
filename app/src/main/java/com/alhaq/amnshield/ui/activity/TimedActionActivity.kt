@@ -20,7 +20,7 @@ import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.ActivityAddTimedActionActivityBinding
 import com.alhaq.amnshield.databinding.CheatHourItemBinding
 import com.alhaq.amnshield.databinding.DialogAddTimedActionBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 import com.alhaq.amnshield.utils.TimeTools
 import nl.joery.timerangepicker.TimeRangePicker
@@ -258,7 +258,7 @@ class TimedActionActivity : AppCompatActivity() {
             MODE_APP_BLOCKER_CHEAT_HOURS -> {
                 savedPreferencesLoader.saveAppBlockerCheatHoursList(timedActionList)
                 sendBroadcast(
-                    Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                    Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
                         .setPackage(packageName)
                 )
             }
@@ -266,7 +266,7 @@ class TimedActionActivity : AppCompatActivity() {
             MODE_AUTO_FOCUS -> {
                 savedPreferencesLoader.saveAutoFocusHoursList(timedActionList)
                 sendBroadcast(
-                    Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
+                    Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
                         .setPackage(packageName)
                 )
             }

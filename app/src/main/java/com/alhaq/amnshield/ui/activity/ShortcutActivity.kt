@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.dialogs.StartFocusMode
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 
@@ -24,10 +24,10 @@ class ShortcutActivity : AppCompatActivity() {
             finish()
         }
 
-        val isGeneralSettingsOn = isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)
+        val isGeneralSettingsOn = isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)
         if(!isGeneralSettingsOn){
-            Toast.makeText(this,"Enable DeenShield Accessibility Service first",Toast.LENGTH_LONG).show()
-            openAccessibilityServiceScreen(cls = DeenShieldAccessibilityService::class.java)
+            Toast.makeText(this,"Enable AmnShield Accessibility Service first",Toast.LENGTH_LONG).show()
+            openAccessibilityServiceScreen(cls = AmnShieldAccessibilityService::class.java)
             finish()
         }
         StartFocusMode(savedPreferencesLoader, onPositiveButtonPressed = {

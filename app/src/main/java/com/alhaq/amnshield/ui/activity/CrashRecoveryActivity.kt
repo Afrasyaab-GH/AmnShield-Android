@@ -49,7 +49,7 @@ class CrashRecoveryActivity : AppCompatActivity() {
     private fun setupUI(crashMessage: String) {
         // Title and description
         binding.crashTitle.text = "Oops! We encountered an issue"
-        binding.crashDescription.text = "DeenShield crashed unexpectedly. We've saved diagnostic information."
+        binding.crashDescription.text = "AmnShield crashed unexpectedly. We've saved diagnostic information."
 
         // Show last error if available
         if (crashMessage.isNotEmpty()) {
@@ -121,7 +121,7 @@ class CrashRecoveryActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(
                     this,
-                    "Thank you for your feedback. It will help us improve DeenShield.",
+                    "Thank you for your feedback. It will help us improve AmnShield.",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -161,7 +161,7 @@ class CrashRecoveryActivity : AppCompatActivity() {
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "DeenShield Error Report")
+            putExtra(Intent.EXTRA_SUBJECT, "AmnShield Error Report")
             putExtra(Intent.EXTRA_TEXT, emailBody)
             putExtra(Intent.EXTRA_CC, SUPPORT_CC_ADDRESSES.filter { !TextUtils.isEmpty(it) }.toTypedArray())
             putExtra(Intent.EXTRA_STREAM, attachmentUri)

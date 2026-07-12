@@ -156,7 +156,7 @@ class AllAppsUsageFragment : Fragment() {
 
                         intent.putExtra("fragment", FRAGMENT_ID)
                         val shortcutInfo =
-                            ShortcutInfoCompat.Builder(requireContext(), "deenshield_usage_tracker")
+                            ShortcutInfoCompat.Builder(requireContext(), "amnshield_usage_tracker")
                                 .setShortLabel("Usage Stats")
                                 .setLongLabel("Usage Stats")
                                 .setIntent(intent)
@@ -264,7 +264,7 @@ class AllAppsUsageFragment : Fragment() {
             getString(R.string.enable_2, "Device Usage Access")
 
         dialogBinding.desc.text =
-            "DeenShield requires device usage access to monitor apps, helping you manage screen time effectively and stay focused on your goals. Rest assured, all data stays securely on your device and is never shared with anyone, ensuring your privacy is fully protected."
+            "AmnShield requires device usage access to monitor apps, helping you manage screen time effectively and stay focused on your goals. Rest assured, all data stays securely on your device and is never shared with anyone, ensuring your privacy is fully protected."
 
         dialogBinding.point1.text = "Track what apps you use"
         dialogBinding.point2.visibility = View.GONE
@@ -278,7 +278,7 @@ class AllAppsUsageFragment : Fragment() {
             activity?.finish()
         }
         dialogBinding.btnAccept.setOnClickListener {
-            Toast.makeText(requireContext(), "Find 'DeenShield' and press enable", Toast.LENGTH_LONG)
+            Toast.makeText(requireContext(), "Find 'AmnShield' and press enable", Toast.LENGTH_LONG)
                 .show()
             requestUsageStatsPermission(requireContext())
             dialog.dismiss()

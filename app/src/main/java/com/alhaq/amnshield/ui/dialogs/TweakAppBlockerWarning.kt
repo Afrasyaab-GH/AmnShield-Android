@@ -8,7 +8,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.DialogTweakBlockerWarningBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.activity.MainActivity
 import com.alhaq.amnshield.utils.AnimTools.Companion.animateVisibility
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
@@ -92,7 +92,7 @@ class TweakAppBlockerWarning(savedPreferencesLoader: SavedPreferencesLoader) : B
                         proceedDelay
                     )
                 )
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
                 dialog.dismiss()
             }
             .setCancelable(false)

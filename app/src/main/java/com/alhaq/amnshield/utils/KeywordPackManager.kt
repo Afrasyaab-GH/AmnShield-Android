@@ -14,7 +14,7 @@ data class KeywordPack(
     val keywords: List<String>,
     val version: Int = 1,
     val verified: Boolean = false,
-    val author: String = "DeenShield Community"
+    val author: String = "AmnShield Community"
 )
 
 class KeywordPackManager(private val context: Context) {
@@ -104,7 +104,7 @@ class KeywordPackManager(private val context: Context) {
                 keywords = com.alhaq.amnshield.data.blockers.KeywordPacks.adultKeywords.toList(),
                 version = 1,
                 verified = true,
-                author = "DeenShield Official"
+                author = "AmnShield Official"
             )
         )
     }
@@ -119,7 +119,7 @@ class KeywordPackManager(private val context: Context) {
             keywords = keywords.toList(),
             version = 1,
             verified = false,
-            author = "DeenShield User"
+            author = "AmnShield User"
         )
         return gson.toJson(pack)
     }

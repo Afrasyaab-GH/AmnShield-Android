@@ -37,20 +37,20 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
-class DeenShieldAccessibilityService : BaseBlockingService() {
+class AmnShieldAccessibilityService : BaseBlockingService() {
 
     companion object {
-        const val INTENT_ACTION_REFRESH_APP_BLOCKER = "deenshield.refresh.appblocker"
-        const val INTENT_ACTION_REFRESH_APP_BLOCKER_COOLDOWN = "deenshield.refresh.appblocker.cooldown"
-        const val INTENT_ACTION_REFRESH_FOCUS_MODE = "deenshield.refresh.focusmode"
-        const val INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST = "deenshield.refresh.keywords"
-        const val INTENT_ACTION_REFRESH_VIEW_BLOCKER = "deenshield.refresh.viewblocker"
-        const val INTENT_ACTION_REFRESH_VIEW_BLOCKER_COOLDOWN = "deenshield.refresh.viewblocker.cooldown"
-        const val INTENT_ACTION_REFRESH_REEL_BLOCKER = "deenshield.refresh.reelblocker"
-        const val INTENT_ACTION_REFRESH_REEL_BLOCKER_COOLDOWN = "deenshield.refresh.reelblocker.cooldown"
-        const val INTENT_ACTION_REFRESH_UNIFIED_FEATURE_SCHEDULES = "deenshield.refresh.unified.feature.schedules"
-        const val INTENT_ACTION_REFRESH_ANTI_UNINSTALL = ".deenshield.refresh.anti_uninstall"
-        const val INTENT_ACTION_PASSWORD_VERIFIED = "deenshield.password.verified"
+        const val INTENT_ACTION_REFRESH_APP_BLOCKER = "amnshield.refresh.appblocker"
+        const val INTENT_ACTION_REFRESH_APP_BLOCKER_COOLDOWN = "amnshield.refresh.appblocker.cooldown"
+        const val INTENT_ACTION_REFRESH_FOCUS_MODE = "amnshield.refresh.focusmode"
+        const val INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST = "amnshield.refresh.keywords"
+        const val INTENT_ACTION_REFRESH_VIEW_BLOCKER = "amnshield.refresh.viewblocker"
+        const val INTENT_ACTION_REFRESH_VIEW_BLOCKER_COOLDOWN = "amnshield.refresh.viewblocker.cooldown"
+        const val INTENT_ACTION_REFRESH_REEL_BLOCKER = "amnshield.refresh.reelblocker"
+        const val INTENT_ACTION_REFRESH_REEL_BLOCKER_COOLDOWN = "amnshield.refresh.reelblocker.cooldown"
+        const val INTENT_ACTION_REFRESH_UNIFIED_FEATURE_SCHEDULES = "amnshield.refresh.unified.feature.schedules"
+        const val INTENT_ACTION_REFRESH_ANTI_UNINSTALL = ".amnshield.refresh.anti_uninstall"
+        const val INTENT_ACTION_PASSWORD_VERIFIED = "amnshield.password.verified"
 
         private const val REEL_TRACKER_SCROLL_DEBOUNCE_MS = 800L
         private const val REEL_TRACKER_DUPLICATE_WINDOW_MS = 2_500L
@@ -230,7 +230,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
                 eventCopy.recycle()
             }
         } catch (t: Throwable) {
-            android.util.Log.e("DeenShield", "Accessibility pipeline error", t)
+            android.util.Log.e("AmnShield", "Accessibility pipeline error", t)
             crashLogger.logNonFatalError("AccessibilityService", "Pipeline error", Exception(t))
         } finally {
             rootNode?.recycle()
@@ -244,7 +244,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
                     processDeferredChecks(event)
                 } catch (t: Throwable) {
                     if (t is CancellationException) throw t
-                    android.util.Log.e("DeenShield", "Deferred blocker worker error", t)
+                    android.util.Log.e("AmnShield", "Deferred blocker worker error", t)
                     crashLogger.logNonFatalError("AccessibilityService", "Deferred blocker error", Exception(t))
                 } finally {
                     event.recycle()
@@ -278,7 +278,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
                         return
                     }
                 } catch (e: Exception) {
-                    android.util.Log.e("DeenShield", "Core Keyword blocker error", e)
+                    android.util.Log.e("AmnShield", "Core Keyword blocker error", e)
                 }
             }
 
@@ -299,7 +299,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
                         return
                     }
                 } catch (e: Exception) {
-                    android.util.Log.e("DeenShield", "Reel blocker error", e)
+                    android.util.Log.e("AmnShield", "Reel blocker error", e)
                 }
             }
         } finally {
@@ -496,7 +496,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
         try {
             savedPreferencesLoader.trackAppLaunch(packageName)
         } catch (e: Exception) {
-            android.util.Log.e("DeenShield", "Error tracking app launch", e)
+            android.util.Log.e("AmnShield", "Error tracking app launch", e)
         }
     }
 
@@ -649,7 +649,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
         traverseAndDetectScreen(node, node) { detectedType, appPackage ->
             when (detectedType) {
                 "device_admin" -> if (isAntiUninstallOn && isConfiguringBlocked) isDangerousScreen = true
-                "accessibility_deenshield" -> if (isAntiUninstallOn && isConfiguringBlocked) isDangerousScreen = true
+                "accessibility_amnshield" -> if (isAntiUninstallOn && isConfiguringBlocked) isDangerousScreen = true
                 "app_uninstall" -> if (appPackage != null && protectedApps.contains(appPackage)) isDangerousScreen = true
             }
         }
@@ -760,7 +760,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
             val nodeText = node.text?.toString()?.lowercase(Locale.ROOT) ?: ""
 
             if ((nodeText.contains("device admin") || nodeText.contains("device administrators")) &&
-                checkForDeenShieldMention(windowRoot)
+                checkForAmnShieldMention(windowRoot)
             ) {
                 if (checkForActionButton(windowRoot)) {
                     onScreenDetected("device_admin", null)
@@ -768,9 +768,9 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
                 }
             }
 
-            if (nodeText.contains("deenshield") && nodeText.contains("accessibility")) {
+            if (nodeText.contains("amnshield") && nodeText.contains("accessibility")) {
                 if (checkForToggleContext(windowRoot)) {
-                    onScreenDetected("accessibility_deenshield", null)
+                    onScreenDetected("accessibility_amnshield", null)
                     return
                 }
             }
@@ -876,12 +876,12 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
         return false
     }
 
-    private fun checkForDeenShieldMention(node: AccessibilityNodeInfo?): Boolean {
+    private fun checkForAmnShieldMention(node: AccessibilityNodeInfo?): Boolean {
         if (node == null) return false
 
         if (node.className != null && node.className == "android.widget.TextView") {
             val nodeText = node.text?.toString()?.lowercase(Locale.ROOT) ?: ""
-            if (nodeText.contains("deenshield")) {
+            if (nodeText.contains("amnshield")) {
                 return true
             }
         }
@@ -889,7 +889,7 @@ class DeenShieldAccessibilityService : BaseBlockingService() {
         for (i in 0 until node.childCount) {
             val child = node.getChild(i)
             if (child != null) {
-                val found = checkForDeenShieldMention(child)
+                val found = checkForAmnShieldMention(child)
                 child.recycle()
                 if (found) return true
             }

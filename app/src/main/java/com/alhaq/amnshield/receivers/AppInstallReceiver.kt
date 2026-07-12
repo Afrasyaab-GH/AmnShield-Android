@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.alhaq.amnshield.data.blockers.PackageWand
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 
 /**
@@ -28,7 +28,7 @@ class AppInstallReceiver : BroadcastReceiver() {
         // Get the package name of the newly installed app
         val packageName = intent.data?.schemeSpecificPart ?: return
         
-        // Don't auto-block DeenShield itself
+        // Don't auto-block AmnShield itself
         if (packageName == "com.alhaq.amnshield") return
         
         // Get enabled auto-block categories
@@ -52,7 +52,7 @@ class AppInstallReceiver : BroadcastReceiver() {
             prefsLoader.saveBlockedApps(currentBlockedApps)
             
             // Refresh the accessibility service (scoped to our package only)
-            val refreshIntent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+            val refreshIntent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
                 .setPackage(context.packageName)
             context.sendBroadcast(refreshIntent)
             

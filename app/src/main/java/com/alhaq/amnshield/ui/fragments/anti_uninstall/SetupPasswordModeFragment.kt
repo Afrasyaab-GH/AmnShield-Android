@@ -17,7 +17,7 @@ import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.FragmentSetupPasswordModeBinding
 import com.alhaq.amnshield.databinding.DialogPermissionInfoBinding
 import com.alhaq.amnshield.receivers.AdminReceiver
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 
 class SetupPasswordModeFragment : Fragment() {
 
@@ -169,7 +169,7 @@ class SetupPasswordModeFragment : Fragment() {
             commit()
         }
 
-        val intent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_ANTI_UNINSTALL)
+        val intent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_ANTI_UNINSTALL)
             .setPackage(activity?.packageName)
         activity?.sendBroadcast(intent)
 

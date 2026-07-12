@@ -10,12 +10,12 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import com.alhaq.amnshield.receivers.AdminReceiver
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 
 class PermissionsManager(private val context: Context) {
 
     fun isAccessibilityServiceEnabled(): Boolean {
-        return isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)
+        return isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)
     }
 
     private fun isAccessibilityServiceEnabled(serviceClass: Class<out AccessibilityService>): Boolean {

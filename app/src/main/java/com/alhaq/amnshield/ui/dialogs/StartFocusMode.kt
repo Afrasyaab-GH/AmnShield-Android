@@ -15,7 +15,7 @@ import com.alhaq.amnshield.Constants
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.blockers.FocusModeBlocker
 import com.alhaq.amnshield.databinding.DialogFocusModeBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.NotificationTimerManager
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 
@@ -154,7 +154,7 @@ class StartFocusMode(
         // Save focus session start time to track later
         savedPreferencesLoader?.saveFocusSessionStartTime(startTime, endTime)
         
-        sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
+        sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
         val timer = NotificationTimerManager(requireContext())
         timer.startTimer(duration)
         onPositiveButtonPressed()

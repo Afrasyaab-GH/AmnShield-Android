@@ -241,7 +241,7 @@ class ErrorReportManager(private val context: Context) {
      */
     fun exportReportsAsText(): String {
         return buildString {
-            append("DeenShield Error Report Export\n")
+            append("AmnShield Error Report Export\n")
             append("Generated: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())}\n")
             append("\n${"═".repeat(60)}\n\n")
             
@@ -266,7 +266,7 @@ class ErrorReportManager(private val context: Context) {
         return try {
             val shareDir = File(context.cacheDir, "shared_reports").apply { mkdirs() }
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val reportFile = File(shareDir, "deenshield_error_report_$timestamp.txt")
+            val reportFile = File(shareDir, "amnshield_error_report_$timestamp.txt")
 
             val content = buildString {
                 if (!prefixText.isNullOrBlank()) {

@@ -8,7 +8,7 @@ import android.os.Bundle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.DialogConfigTrackerBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 
 class TweakUsageTracker(
@@ -49,7 +49,7 @@ class TweakUsageTracker(
                 }
 
                 // Send broadcast to refresh UsageTrackingService
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER)
                 dialog.dismiss()
             }
             .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->

@@ -11,7 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.alhaq.amnshield.data.blockers.AppLaunchLimitRule
 import com.alhaq.amnshield.databinding.FragmentManageLaunchLimitsBinding
 import com.alhaq.amnshield.premium.PremiumManager
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.adapters.LaunchLimitAdapter
 import com.alhaq.amnshield.ui.dialogs.SetLaunchLimitDialog
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
@@ -154,9 +154,9 @@ class ManageLaunchLimitsFragment : Fragment() {
     }
 
     private fun sendRefreshRequest() {
-        val intent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+        val intent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
         requireContext().sendBroadcast(intent.setPackage(requireContext().packageName))
-        val unifiedIntent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_UNIFIED_FEATURE_SCHEDULES)
+        val unifiedIntent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_UNIFIED_FEATURE_SCHEDULES)
         requireContext().sendBroadcast(unifiedIntent.setPackage(requireContext().packageName))
     }
 

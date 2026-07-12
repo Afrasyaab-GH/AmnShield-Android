@@ -19,7 +19,7 @@ class ScreentimeWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val TAG = "ScreentimeWidgetProvider"
-        private const val ACTION_WIDGET_REFRESH = ".deenshield.screentime.WIDGET_REFRESH"
+        private const val ACTION_WIDGET_REFRESH = ".amnshield.screentime.WIDGET_REFRESH"
     }
 
     override fun onUpdate(

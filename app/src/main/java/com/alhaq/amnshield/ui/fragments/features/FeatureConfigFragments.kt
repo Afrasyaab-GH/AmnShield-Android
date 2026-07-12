@@ -15,7 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.blockers.ReelBlocker
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.activity.SelectAppsActivity
 import com.alhaq.amnshield.ui.activity.TimedActionActivity
 import com.alhaq.amnshield.ui.activity.ManageKeywordsActivity
@@ -49,7 +49,7 @@ class AppBlockerConfigFragment : BaseFeatureFragment() {
             val selectedApps = result.data?.getStringArrayListExtra("SELECTED_APPS")
             selectedApps?.let {
                 savedPreferencesLoader.saveBlockedApps(it.toSet())
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
                 updateSelectedAppsCount(it.size)
             }
         }
@@ -59,7 +59,7 @@ class AppBlockerConfigFragment : BaseFeatureFragment() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
             Toast.makeText(requireContext(), "Cheat hours updated", Toast.LENGTH_SHORT).show()
         }
     }
@@ -82,13 +82,13 @@ class AppBlockerConfigFragment : BaseFeatureFragment() {
         }
 
         // Check service status
-        if (!isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)) {
+        if (!isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)) {
             binding.configContainer.visibility = View.GONE
             binding.statusCard.visibility = View.VISIBLE
-            binding.statusMessage.text = "Please enable the main DeenShield Accessibility Service"
+            binding.statusMessage.text = "Please enable the main AmnShield Accessibility Service"
             binding.btnStatusAction.text = "Enable Service"
             binding.btnStatusAction.setOnClickListener {
-                showAccessibilityInfoDialog("DeenShield Accessibility Service", DeenShieldAccessibilityService::class.java)
+                showAccessibilityInfoDialog("AmnShield Accessibility Service", AmnShieldAccessibilityService::class.java)
             }
             return binding.root
         }
@@ -103,7 +103,7 @@ class AppBlockerConfigFragment : BaseFeatureFragment() {
         binding.switchAppBlockerEnabled.setOnCheckedChangeListener { _, isChecked ->
             savedPreferencesLoader.setAppBlockerFeatureEnabled(isChecked)
             setAppBlockerControlsEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
         }
         
         updateSelectedAppsCount(savedPreferencesLoader.loadBlockedApps().size)
@@ -248,13 +248,13 @@ class ReelBlockerConfigFragment : BaseFeatureFragment() {
             return binding.root
         }
 
-        if (!isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)) {
+        if (!isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)) {
             binding.configContainer.visibility = View.GONE
             binding.statusCard.visibility = View.VISIBLE
-            binding.statusMessage.text = "Please enable the main DeenShield Accessibility Service"
+            binding.statusMessage.text = "Please enable the main AmnShield Accessibility Service"
             binding.btnStatusAction.text = "Enable Service"
             binding.btnStatusAction.setOnClickListener {
-                showAccessibilityInfoDialog("DeenShield Accessibility Service", DeenShieldAccessibilityService::class.java)
+                showAccessibilityInfoDialog("AmnShield Accessibility Service", AmnShieldAccessibilityService::class.java)
             }
             return binding.root
         }
@@ -284,24 +284,24 @@ class ReelBlockerConfigFragment : BaseFeatureFragment() {
 
         binding.switchYoutube.setOnCheckedChangeListener { _, isChecked ->
             savedPreferencesLoader.setReelBlockerYoutubeEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
         }
         binding.switchInstagram.setOnCheckedChangeListener { _, isChecked ->
             savedPreferencesLoader.setReelBlockerInstagramEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
         }
         binding.switchTiktok.setOnCheckedChangeListener { _, isChecked ->
             savedPreferencesLoader.setReelBlockerTiktokEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
         }
         binding.switchBrowser.setOnCheckedChangeListener { _, isChecked ->
             savedPreferencesLoader.setReelBlockerBrowserEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
         }
 
         binding.switchReelBlocker.setOnCheckedChangeListener { _, isChecked ->
             savedPreferencesLoader.setReelBlockerEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
         }
 
         binding.switchCountMode.setOnCheckedChangeListener { _, isChecked ->
@@ -312,7 +312,7 @@ class ReelBlockerConfigFragment : BaseFeatureFragment() {
             }
             binding.inputLimitLayout.isEnabled = isChecked
             savedPreferencesLoader.setReelBlockerMode(selectedMode)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
         }
 
         binding.btnSaveMode.setOnClickListener {
@@ -322,7 +322,7 @@ class ReelBlockerConfigFragment : BaseFeatureFragment() {
                 return@setOnClickListener
             }
             savedPreferencesLoader.setReelBlockerDailyLimit(parsed)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
             Toast.makeText(requireContext(), "Saved", Toast.LENGTH_SHORT).show()
         }
 
@@ -382,13 +382,13 @@ class UsageTrackerConfigFragment : BaseFeatureFragment() {
         _binding = com.alhaq.amnshield.databinding.FragmentUsageTrackerConfigBinding.inflate(inflater, container, false)
 
         // Check service status
-        if (!isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)) {
+        if (!isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)) {
             binding.configContainer.visibility = View.GONE
             binding.statusCard.visibility = View.VISIBLE
-            binding.statusMessage.text = "Please enable the main DeenShield Accessibility Service"
+            binding.statusMessage.text = "Please enable the main AmnShield Accessibility Service"
             binding.btnStatusAction.text = "Enable Service"
             binding.btnStatusAction.setOnClickListener {
-                showAccessibilityInfoDialog("DeenShield Accessibility Service", DeenShieldAccessibilityService::class.java)
+                showAccessibilityInfoDialog("AmnShield Accessibility Service", AmnShieldAccessibilityService::class.java)
             }
             return binding.root
         }
@@ -462,7 +462,7 @@ class KeywordBlockerConfigFragment : BaseFeatureFragment() {
             val selectedKeywords = result.data?.getStringArrayListExtra("SELECTED_KEYWORDS")
             selectedKeywords?.let {
                 savedPreferencesLoader.saveBlockedKeywords(it.toSet())
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
                 updateKeywordCount(it.size)
                 Toast.makeText(requireContext(), "Keywords updated", Toast.LENGTH_SHORT).show()
             }
@@ -477,13 +477,13 @@ class KeywordBlockerConfigFragment : BaseFeatureFragment() {
         _binding = com.alhaq.amnshield.databinding.FragmentKeywordBlockerConfigBinding.inflate(inflater, container, false)
 
         // Check service status
-        if (!isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)) {
+        if (!isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)) {
             binding.configContainer.visibility = View.GONE
             binding.statusCard.visibility = View.VISIBLE
-            binding.statusMessage.text = "Please enable the main DeenShield Accessibility Service"
+            binding.statusMessage.text = "Please enable the main AmnShield Accessibility Service"
             binding.btnStatusAction.text = "Enable Service"
             binding.btnStatusAction.setOnClickListener {
-                showAccessibilityInfoDialog("DeenShield Accessibility Service", DeenShieldAccessibilityService::class.java)
+                showAccessibilityInfoDialog("AmnShield Accessibility Service", AmnShieldAccessibilityService::class.java)
             }
             return binding.root
         }
@@ -498,7 +498,7 @@ class KeywordBlockerConfigFragment : BaseFeatureFragment() {
         binding.switchKeywordBlockerEnabled.setOnCheckedChangeListener { _, isChecked ->
             savedPreferencesLoader.setKeywordBlockerFeatureEnabled(isChecked)
             setKeywordBlockerControlsEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
         }
 
         updateKeywordCount(savedPreferencesLoader.loadBlockedKeywords().size)

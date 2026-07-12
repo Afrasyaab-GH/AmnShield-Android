@@ -15,7 +15,7 @@ import com.alhaq.amnshield.data.blockers.AppBlockScheduleRule
 import com.alhaq.amnshield.data.blockers.UnifiedFeatureScheduleRule
 import com.alhaq.amnshield.databinding.FragmentManageBlockSchedulesBinding
 import com.alhaq.amnshield.premium.PremiumManager
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.data.blockers.AppLaunchLimitRule
 import com.alhaq.amnshield.ui.adapters.BlockScheduleAdapter
 import com.alhaq.amnshield.ui.adapters.LaunchLimitAdapter
@@ -1341,9 +1341,9 @@ class ManageBlockSchedulesFragment : Fragment() {
     }
 
     private fun sendRefreshRequest() {
-        val intent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+        val intent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
         requireContext().sendBroadcast(intent.setPackage(requireContext().packageName))
-        val unifiedIntent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_UNIFIED_FEATURE_SCHEDULES)
+        val unifiedIntent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_UNIFIED_FEATURE_SCHEDULES)
         requireContext().sendBroadcast(unifiedIntent.setPackage(requireContext().packageName))
     }
 

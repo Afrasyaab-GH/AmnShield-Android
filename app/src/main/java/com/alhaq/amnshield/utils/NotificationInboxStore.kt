@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken
 import java.util.concurrent.TimeUnit
 
 /**
- * Lightweight on-device store for in-app notifications shown by DeenShield
+ * Lightweight on-device store for in-app notifications shown by AmnShield
  * (daily reports, focus reminders, achievements, block alerts, etc.).
  *
  * The toolbar bell icon opens a screen backed by this store so the user sees

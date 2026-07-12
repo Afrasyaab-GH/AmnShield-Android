@@ -8,7 +8,7 @@ import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.DialogAddTimedActionBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 import nl.joery.timerangepicker.TimeRangePicker
 
@@ -93,8 +93,8 @@ class TweakViewBlockerCheatHours(savedPreferencesLoader: SavedPreferencesLoader)
                     startTimeInMins!!,
                     endTimeInMins!!
                 )
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER)
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
                 dialog.dismiss()
             }
             .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->

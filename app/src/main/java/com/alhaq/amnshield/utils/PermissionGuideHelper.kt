@@ -132,7 +132,7 @@ class PermissionGuideHelper(private val activity: Activity) {
     fun openAccessibilitySettings() {
         Toast.makeText(
             context,
-            "Find 'DeenShield' in the list and enable it. If you don't see it, tap the 3-dot menu (⋮) at the top-right corner and enable 'Show restricted settings'",
+            "Find 'AmnShield' in the list and enable it. If you don't see it, tap the 3-dot menu (⋮) at the top-right corner and enable 'Show restricted settings'",
             Toast.LENGTH_LONG
         ).show()
         
@@ -152,7 +152,7 @@ class PermissionGuideHelper(private val activity: Activity) {
     fun openUsageStatsSettings() {
         Toast.makeText(
             context,
-            "Find 'DeenShield' in the list and allow usage access",
+            "Find 'AmnShield' in the list and allow usage access",
             Toast.LENGTH_LONG
         ).show()
         
@@ -172,7 +172,7 @@ class PermissionGuideHelper(private val activity: Activity) {
     fun openOverlaySettings() {
         Toast.makeText(
             context,
-            "Allow 'Display over other apps' permission for DeenShield",
+            "Allow 'Display over other apps' permission for AmnShield",
             Toast.LENGTH_LONG
         ).show()
         
@@ -206,7 +206,7 @@ class PermissionGuideHelper(private val activity: Activity) {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
                 putExtra(
                     DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                    "DeenShield needs device admin permission to prevent accidental uninstallation during focus sessions"
+                    "AmnShield needs device admin permission to prevent accidental uninstallation during focus sessions"
                 )
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }

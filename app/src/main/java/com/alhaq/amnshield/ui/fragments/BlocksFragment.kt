@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.FragmentBlocksBinding
 import com.alhaq.amnshield.premium.PremiumManager
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.activity.FragmentActivity
 import com.alhaq.amnshield.ui.activity.TimedActionActivity
 import com.alhaq.amnshield.ui.fragments.ManageBlockSchedulesFragment
@@ -56,7 +56,7 @@ class BlocksFragment : BaseFeatureFragment() {
     }
 
     private fun refreshDashboard() {
-        val serviceEnabled = isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)
+        val serviceEnabled = isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)
         val premiumEnabled = premiumManager.isPremium()
 
         val appBlockedApps = blocksLoader.loadBlockedApps().size

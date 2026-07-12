@@ -21,7 +21,7 @@ import com.alhaq.amnshield.databinding.FragmentSettingsBinding
 import com.alhaq.amnshield.ui.activity.MainActivity
 import com.alhaq.amnshield.ui.activity.FragmentActivity
 import com.alhaq.amnshield.ui.activity.RemindersActivity
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.premium.PremiumManager
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 import com.alhaq.amnshield.utils.ZipUtils
@@ -158,7 +158,7 @@ class SettingsFragment : Fragment() {
         binding.switchKeywordBlockerQuick.setOnCheckedChangeListener { _, isChecked ->
             if (suppressFeatureSwitchChange) return@setOnCheckedChangeListener
             savedPreferencesLoader.setKeywordBlockerFeatureEnabled(isChecked)
-            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
             updateFeatureStatuses()
         }
 
@@ -219,7 +219,7 @@ class SettingsFragment : Fragment() {
             return
         }
         savedPreferencesLoader.setReelBlockerEnabled(enabled)
-        sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
+        sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER)
         updateFeatureStatuses()
     }
 
@@ -312,7 +312,7 @@ class SettingsFragment : Fragment() {
 
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "DeenShield Crash Log")
+            putExtra(Intent.EXTRA_SUBJECT, "AmnShield Crash Log")
             putExtra(Intent.EXTRA_TEXT, "Bundled crash report attached.")
             putExtra(Intent.EXTRA_CC, arrayOf("support@alhaq-initiative.org", "alhaq.dst@gmail.com"))
             putExtra(Intent.EXTRA_STREAM, attachmentUri)
@@ -337,13 +337,13 @@ class SettingsFragment : Fragment() {
                 ═══════════════════════════
                 
                 Q: Do I need to create an account?
-                A: No. DeenShield works completely offline. Google Sign-In is optional and only used for premium purchases.
+                A: No. AmnShield works completely offline. Google Sign-In is optional and only used for premium purchases.
                 
-                Q: Which permissions does DeenShield need?
-                A: DeenShield requires Accessibility Service permission to detect and block apps/content. All processing happens on your device - no data is collected.
+                Q: Which permissions does AmnShield need?
+                A: AmnShield requires Accessibility Service permission to detect and block apps/content. All processing happens on your device - no data is collected.
                 
                 Q: Is my data safe?
-                A: Yes! DeenShield doesn't collect, store, or transmit any of your data. All AI processing happens locally on your device.
+                A: Yes! AmnShield doesn't collect, store, or transmit any of your data. All AI processing happens locally on your device.
                 
                 ═══════════════════════════
                 🔒 CORE FEATURES (FREE)
@@ -359,7 +359,7 @@ class SettingsFragment : Fragment() {
                 A: Focus Mode temporarily blocks selected apps for a set duration, helping you stay productive. Sessions are tracked for insights.
                 
                 Q: What is Anti-Uninstall Protection?
-                A: Anti-uninstall prevents you from removing DeenShield protection. Choose password mode (requires password) or timed mode (blocks until a future date). Premium feature.
+                A: Anti-uninstall prevents you from removing AmnShield protection. Choose password mode (requires password) or timed mode (blocks until a future date). Premium feature.
                 
                 ═══════════════════════════
                 ⭐ PREMIUM FEATURES
@@ -385,7 +385,7 @@ class SettingsFragment : Fragment() {
                 A: We offer Monthly (GBP 3.5/month), Yearly (GBP 2.5/month billed yearly), and Lifetime (GBP 13.5 one-time).
                 
                 Q: How do I cancel my subscription?
-                A: Open Google Play Store → Profile → Payments & subscriptions → Subscriptions → DeenShield → Cancel. You keep premium until the end of your billing period.
+                A: Open Google Play Store → Profile → Payments & subscriptions → Subscriptions → AmnShield → Cancel. You keep premium until the end of your billing period.
                 
                 Q: Can I switch from monthly to lifetime?
                 A: Yes! Purchase the lifetime plan and your monthly subscription will be canceled automatically.
@@ -398,7 +398,7 @@ class SettingsFragment : Fragment() {
                 ═══════════════════════════
                 
                 Q: Features not working?
-                A: 1) Enable Accessibility Service in Settings → Accessibility → DeenShield
+                A: 1) Enable Accessibility Service in Settings → Accessibility → AmnShield
                    2) Enable Device Admin in Settings → Security → Device Admin Apps
                    3) Restart the app
                 
@@ -409,7 +409,7 @@ class SettingsFragment : Fragment() {
                 A: Go to Keyword Blocker → Configure → Add system apps like Settings, Launcher to "Ignored Apps" list.
                 
                 Q: Battery drain?
-                A: DeenShield uses minimal battery. Check Settings → Battery → Background restriction is OFF for DeenShield.
+                A: AmnShield uses minimal battery. Check Settings → Battery → Background restriction is OFF for AmnShield.
                 
                 Q: How to backup my settings?
                 A: Settings → Data Management → Backup to save all your configurations.
@@ -418,17 +418,17 @@ class SettingsFragment : Fragment() {
                 🔐 PRIVACY & SECURITY
                 ═══════════════════════════
                 
-                Q: Does DeenShield track my activity?
+                Q: Does AmnShield track my activity?
                 A: No. All statistics are stored locally on your device only.
                 
-                Q: Does DeenShield require internet?
+                Q: Does AmnShield require internet?
                 A: No. All features work offline. Internet is only needed for premium purchases.
                 
                 Q: Is my browsing history collected?
-                A: Never. DeenShield only detects keywords and content in real-time, nothing is stored or transmitted.
+                A: Never. AmnShield only detects keywords and content in real-time, nothing is stored or transmitted.
                 
-                Q: Is DeenShield open source?
-                A: No. DeenShield's core protection engine is closed-source. We focus on clear privacy documentation, on-device processing, and selective transparency where appropriate.
+                Q: Is AmnShield open source?
+                A: No. AmnShield's core protection engine is closed-source. We focus on clear privacy documentation, on-device processing, and selective transparency where appropriate.
                 
                 ═══════════════════════════
                 📞 SUPPORT & CONTACT
@@ -468,7 +468,7 @@ class SettingsFragment : Fragment() {
             val message = """
                 Version: $versionName
                 
-                DeenShield is an Islamic digital wellbeing app that helps Muslims maintain a halal digital lifestyle through practical protection and healthy habits.
+                AmnShield is an Islamic digital wellbeing app that helps Muslims maintain a halal digital lifestyle through practical protection and healthy habits.
                 
                 ✅ Free Features (Forever):
                 • Keyword Blocker with custom lists & packs
@@ -494,7 +494,7 @@ class SettingsFragment : Fragment() {
             """.trimIndent()
 
             MaterialAlertDialogBuilder(ctx)
-                .setTitle(getString(R.string.about_deenshield))
+                .setTitle(getString(R.string.about_amnshield))
                 .setMessage(message)
                 .setPositiveButton("Website") { _, _ ->
                     openUrl(Constants.AMNSHIELD_WEBSITE_URL)

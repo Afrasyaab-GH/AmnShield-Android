@@ -14,7 +14,7 @@ import androidx.core.app.ActivityOptionsCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.DialogKeywordBlockerConfigBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.activity.SelectAppsActivity
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 
@@ -40,7 +40,7 @@ class TweakKeywordBlocker(savedPreferencesLoader: SavedPreferencesLoader) :
                         savedPreferencesLoader?.saveKeywordBlockerIgnoredApps(selectedApps)
                         // Notify the accessibility service so the in-memory ignored-package
                         // set is refreshed without waiting for the dialog OK button.
-                        sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+                        sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
                     }
                 }
             }
@@ -105,7 +105,7 @@ class TweakKeywordBlocker(savedPreferencesLoader: SavedPreferencesLoader) :
                 }
 
                 // Send broadcast to refresh the KeywordBlockerService
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
             }
             .setNegativeButton(getString(R.string.close)) { _, _ ->
                 // Do nothing on cancel

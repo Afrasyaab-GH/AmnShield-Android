@@ -10,7 +10,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.alhaq.amnshield.Constants
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.DialogWarningOverlayBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 
 
@@ -109,9 +109,9 @@ class WarningActivity : AppCompatActivity() {
                 intent.getStringExtra("result_id")
                     ?.let { it1 ->
                         val refreshAction = if (isReelBlockerWarning) {
-                            DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER_COOLDOWN
+                            AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_REEL_BLOCKER_COOLDOWN
                         } else {
-                            DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER_COOLDOWN
+                            AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_VIEW_BLOCKER_COOLDOWN
                         }
                         sendRefreshRequest(
                             it1,
@@ -126,7 +126,7 @@ class WarningActivity : AppCompatActivity() {
                     ?.let { it1 ->
                         sendRefreshRequest(
                             it1,
-                            DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER_COOLDOWN,
+                            AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER_COOLDOWN,
                             binding.minsPicker.getValue()
                         )
                         val intent = packageManager.getLaunchIntentForPackage(it1)

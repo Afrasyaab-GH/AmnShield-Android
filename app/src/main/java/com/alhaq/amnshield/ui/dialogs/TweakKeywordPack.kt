@@ -8,7 +8,7 @@ import android.os.Bundle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.DialogKeywordPackageBinding
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.utils.SavedPreferencesLoader
 
 class TweakKeywordPack : BaseDialog() {
@@ -53,7 +53,7 @@ class TweakKeywordPack : BaseDialog() {
                 loader.setKeywordBlockerAdultPackEnabled(isAdultPackEnabled)
 
                 // Send broadcast to refresh the KeywordBlockerService
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
             }
             .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()

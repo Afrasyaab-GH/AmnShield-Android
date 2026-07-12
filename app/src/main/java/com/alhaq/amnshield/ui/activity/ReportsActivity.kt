@@ -216,7 +216,7 @@ class ReportsActivity : AppCompatActivity() {
     private fun exportReport(reports: List<Report>) {
         try {
             val reportBuilder = StringBuilder()
-            reportBuilder.append("DeenShield Stats & Report\n")
+            reportBuilder.append("AmnShield Stats & Report\n")
             reportBuilder.append("=========================\n")
             reportBuilder.append("Date: ${currentDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))}\n")
 
@@ -249,7 +249,7 @@ class ReportsActivity : AppCompatActivity() {
                 reportBuilder.append("\n")
             }
 
-            val file = File(cacheDir, "deenshield_report.txt")
+            val file = File(cacheDir, "amnshield_report.txt")
             file.writeText(reportBuilder.toString())
 
             val uri = FileProvider.getUriForFile(this, "${packageName}.provider", file)

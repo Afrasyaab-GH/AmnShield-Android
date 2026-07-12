@@ -95,7 +95,7 @@ abstract class BaseFeatureFragment : Fragment() {
         dialogBinding.btnAccept.setOnClickListener {
             Toast.makeText(
                 requireContext(),
-                getString(R.string.find_deenshield_and_press_enable),
+                getString(R.string.find_amnshield_and_press_enable),
                 Toast.LENGTH_LONG
             ).show()
             openAccessibilityServiceScreen(serviceClass)
@@ -130,7 +130,7 @@ abstract class BaseFeatureFragment : Fragment() {
         dialogBinding.btnAccept.setOnClickListener {
             Toast.makeText(
                 requireContext(),
-                getString(R.string.find_deenshield_and_press_enable),
+                getString(R.string.find_amnshield_and_press_enable),
                 Toast.LENGTH_LONG
             ).show()
             val intent = Intent(

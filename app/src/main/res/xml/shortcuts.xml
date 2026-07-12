@@ -4,7 +4,7 @@
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
         android:shortcutShortLabel="@string/focus_mode"
-        android:shortcutId="deenshield_focus_mode_shortcut"
+        android:shortcutId="amnshield_focus_mode_shortcut"
         android:shortcutLongLabel="@string/focus_mode">
         <intent
             android:action="android.intent.action.MAIN"

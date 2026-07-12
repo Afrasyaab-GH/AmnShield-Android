@@ -53,7 +53,7 @@ import com.alhaq.amnshield.databinding.ActivityMainBinding
 import com.alhaq.amnshield.databinding.DialogPermissionInfoBinding
 import com.alhaq.amnshield.databinding.DialogRemoveAntiUninstallBinding
 import com.alhaq.amnshield.receivers.AdminReceiver
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 import com.alhaq.amnshield.ui.fragments.HomeFragment
 import com.alhaq.amnshield.ui.fragments.BlocksFragment
 import com.alhaq.amnshield.ui.fragments.StatsFragment
@@ -315,7 +315,7 @@ class MainActivity : AppCompatActivity() {
                     val selectedApps = result.data?.getStringArrayListExtra("SELECTED_APPS")
                     selectedApps?.let {
                         savedPreferencesLoader.saveBlockedApps(it.toSet())
-                        sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                        sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
                     }
                 }
             }
@@ -327,7 +327,7 @@ class MainActivity : AppCompatActivity() {
                     val selectedApps = result.data?.getStringArrayListExtra("SELECTED_APPS")
                     selectedApps?.let {
                         savedPreferencesLoader.saveFocusModeSelectedApps(selectedApps)
-                        sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
+                        sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
                     }
                 }
             }
@@ -348,19 +348,19 @@ class MainActivity : AppCompatActivity() {
                     val blockedKeywords = result.data?.getStringArrayListExtra("SELECTED_KEYWORDS")
                     blockedKeywords?.let {
                         savedPreferencesLoader.saveBlockedKeywords(it.toSet())
-                        sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
+                        sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_BLOCKED_KEYWORD_LIST)
                     }
                 }
             }
 
         addCheatHoursActivity =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
             }
 
         addAutoFocusHoursActivity =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
-                sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
             }
         // Register the directory picker
         directoryPicker = ZipUtils.registerDirectoryPicker(this) { directoryUri ->
@@ -516,8 +516,8 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent, options.toBundle())
                 } else {
                     makeAccessibilityInfoDialog(
-                        "DeenShield",
-                        DeenShieldAccessibilityService::class.java
+                        "AmnShield",
+                        AmnShieldAccessibilityService::class.java
                     )
                 }
             }
@@ -551,7 +551,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnTelegram.setOnClickListener {
-            openUrl("https://t.me/deenshield")
+            openUrl("https://t.me/amnshield")
         }
         binding.btnGithub.setOnClickListener {
             openUrl(Constants.AMNSHIELD_WEBSITE_URL)
@@ -649,7 +649,7 @@ class MainActivity : AppCompatActivity() {
 //        isDisplayOverOtherAppsOn = Settings.canDrawOverlays(this)
 //        lifecycleScope.launch {
 //            withContext(Dispatchers.IO) {
-//                isGeneralSettingsOn = isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)
+//                isGeneralSettingsOn = isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)
 //            }
 //
 //            val devicePolicyManager =
@@ -693,15 +693,15 @@ class MainActivity : AppCompatActivity() {
             if (daysPassed > 5L) {
                 sharedPreferences.edit().putBoolean("is_donation_alerted", true).apply()
                 MaterialAlertDialogBuilder(this)
-                    .setTitle("Support DeenShield Development")
+                    .setTitle("Support AmnShield Development")
                     .setMessage(
-                        "Thank you for using DeenShield! " +
+                        "Thank you for using AmnShield! " +
                                 "\n\nMy name is Habibur Rahman, and I am the founder of Al-Haq Initiative. I\'m a student with a passion for building Islamic wellbeing tools. " +
-                                "I created DeenShield to help Muslims maintain a halal digital lifestyle. " +
-                                "\n\nIf you find DeenShield beneficial, please consider supporting the project by:\n" +
+                                "I created AmnShield to help Muslims maintain a halal digital lifestyle. " +
+                                "\n\nIf you find AmnShield beneficial, please consider supporting the project by:\n" +
                                 "\u2022 Subscribing to Premium (unlocks advanced features)\n" +
                                 "\u2022 Donating via Ko-fi or Stripe\n" +
-                                "\n\nYour support helps keep DeenShield free and ad-free for everyone. JazakAllahu Khairan!"
+                                "\n\nYour support helps keep AmnShield free and ad-free for everyone. JazakAllahu Khairan!"
                     )
                     .setNegativeButton("Close") { dialog, _ ->
                         dialog.dismiss()
@@ -719,7 +719,7 @@ class MainActivity : AppCompatActivity() {
     private fun showSupportOptionsDialog() {
         val options = arrayOf("Subscribe to Premium", "Donate via Ko-fi", "Donate via Stripe")
         MaterialAlertDialogBuilder(this)
-            .setTitle("Support DeenShield")
+            .setTitle("Support AmnShield")
             .setItems(options) { dialog, which ->
                 when (which) {
                     0 -> {
@@ -775,7 +775,7 @@ class MainActivity : AppCompatActivity() {
 
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "DeenShield Crash Log")
+            putExtra(Intent.EXTRA_SUBJECT, "AmnShield Crash Log")
             putExtra(Intent.EXTRA_TEXT, "Bundled crash report attached.")
             putExtra(Intent.EXTRA_CC, SUPPORT_CC_ADDRESSES)
             putExtra(Intent.EXTRA_STREAM, attachmentUri)
@@ -853,7 +853,7 @@ class MainActivity : AppCompatActivity() {
 //            dialog.dismiss()
 //            Toast.makeText(
 //                this,
-//                getString(R.string.find_deenshield_and_press_enable), Toast.LENGTH_LONG
+//                getString(R.string.find_amnshield_and_press_enable), Toast.LENGTH_LONG
 //            ).show()
 //            val intent = Intent(
 //                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -867,7 +867,7 @@ class MainActivity : AppCompatActivity() {
     // makeShizukuInfoDialog removed - Shizuku dependency removed
 
 //    private fun makeAccessibilityInfoDialog(title: String, cls: Class<*>) { // Removed old permission dialog
-//        if (isAccessibilityServiceEnabled(DeenShieldAccessibilityService::class.java)) {
+//        if (isAccessibilityServiceEnabled(AmnShieldAccessibilityService::class.java)) {
 //            return
 //        }
 //        val dialogAccessibilityServiceInfoBinding =
@@ -904,7 +904,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, ShortcutActivity::class.java).apply {
             action = Intent.ACTION_CREATE_SHORTCUT
         }
-        val shortcutInfo = ShortcutInfoCompat.Builder(this, "deenshield_focus_mode")
+        val shortcutInfo = ShortcutInfoCompat.Builder(this, "amnshield_focus_mode")
             .setShortLabel(getString(R.string.focus_mode))
             .setLongLabel(getString(R.string.focus_mode))
             .setIntent(intent)
@@ -994,7 +994,7 @@ class MainActivity : AppCompatActivity() {
                     )
                         .show()
                     antiUninstallInfo.edit().putBoolean("is_anti_uninstall_on", false).commit()
-                    sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                    sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
 
                 } else {
 
@@ -1029,7 +1029,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             antiUninstallInfo.edit().putBoolean("is_anti_uninstall_on", false)
                                 .commit()
-                            sendRefreshRequest(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
+                            sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_APP_BLOCKER)
 
                             Snackbar.make(
                                 binding.root,
@@ -1084,7 +1084,7 @@ class MainActivity : AppCompatActivity() {
         }
         
         val aboutMessage = """
-            DeenShield v$versionName
+            AmnShield v$versionName
             
             A comprehensive Islamic digital wellbeing app designed to help you maintain focus, develop healthy digital habits, and protect yourself from distracting content.
             
@@ -1109,7 +1109,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("OK", null)
             .setNeutralButton(getString(R.string.join_telegram)) { _, _ ->
                 try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/deenshield"))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/amnshield"))
                     startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
                     Toast.makeText(this, "Could not open link", Toast.LENGTH_SHORT).show()
@@ -1339,14 +1339,14 @@ class MainActivity : AppCompatActivity() {
     
     private fun showFAQDialog() {
         val faqItems = arrayOf(
-            "How do I enable accessibility services?" to "Go to Settings → Accessibility → DeenShield, then enable the required services. This is needed for all blocking features to work.",
+            "How do I enable accessibility services?" to "Go to Settings → Accessibility → AmnShield, then enable the required services. This is needed for all blocking features to work.",
             "What is the Notifications bell icon?" to "The bell icon shows your notification inbox with blocking alerts, daily reports, reminders, and achievements. Tap it to view your notification history.",
             "How does Reel Blocker work?" to "Reel Blocker detects and blocks endless scrolling on Instagram Reels, YouTube Shorts, and TikTok videos, helping you maintain focus.",
             "Why do my blocked apps/keywords disappear?" to "Make sure accessibility services stay enabled. Some system optimizations may disable them. You can check status in Settings.",
             "Can I export my settings?" to "Yes! Go to Settings → Backup & Restore to export/import your configuration.",
             "What is Focus Mode?" to "Focus Mode lets you time-box app restrictions (e.g., block gaming apps for 2 hours). It tracks your focus sessions and shows productivity insights.",
-            "How do I disable Anti-Uninstall protection?" to "Go to Settings → Anti-Uninstall, enter your password, and tap Disable. You can then uninstall DeenShield normally.",
-            "Is DeenShield really privacy-focused?" to "Yes! All text analysis, keyword detection, and content blocking happens locally on your device. We never send your data to servers."
+            "How do I disable Anti-Uninstall protection?" to "Go to Settings → Anti-Uninstall, enter your password, and tap Disable. You can then uninstall AmnShield normally.",
+            "Is AmnShield really privacy-focused?" to "Yes! All text analysis, keyword detection, and content blocking happens locally on your device. We never send your data to servers."
         )
         
         val questions = faqItems.map { it.first }.toTypedArray()
@@ -1458,7 +1458,7 @@ class MainActivity : AppCompatActivity() {
             "support@alhaq-initiative.org",
             "alhaq.dst@gmail.com"
         )
-        private const val BRAND_LOGO_ASSET_PATH = "icons/Deenshield_Transparent_bg.png"
+        private const val BRAND_LOGO_ASSET_PATH = "icons/Amnshield_Transparent_bg.png"
         private const val BRAND_BANNER_ASSET_PATH = "icons/Blue and Pink Trendy Gradient Technology X-Frame Banner_20251028_204729_0000.png"
     }
 }

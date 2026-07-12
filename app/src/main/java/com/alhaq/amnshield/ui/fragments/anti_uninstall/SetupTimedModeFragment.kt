@@ -17,7 +17,7 @@ import com.alhaq.amnshield.R
 import com.alhaq.amnshield.databinding.FragmentSetupTimedModeBinding
 import com.alhaq.amnshield.databinding.DialogPermissionInfoBinding
 import com.alhaq.amnshield.receivers.AdminReceiver
-import com.alhaq.amnshield.services.DeenShieldAccessibilityService
+import com.alhaq.amnshield.services.AmnShieldAccessibilityService
 
 class SetupTimedModeFragment : Fragment() {
 
@@ -178,7 +178,7 @@ class SetupTimedModeFragment : Fragment() {
             commit()
         }
 
-        val intent = Intent(DeenShieldAccessibilityService.INTENT_ACTION_REFRESH_ANTI_UNINSTALL)
+        val intent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_ANTI_UNINSTALL)
             .setPackage(activity?.packageName)
         activity?.sendBroadcast(intent)
 

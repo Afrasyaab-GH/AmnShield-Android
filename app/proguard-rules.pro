@@ -1,4 +1,4 @@
-# DeenShield ProGuard Rules - Production v1.0.0
+# AmnShield ProGuard Rules - Production v1.0.0
 # Add project specific ProGuard rules here.
 
 # Enable optimization
@@ -143,7 +143,7 @@
 }
 
 # ==================== Keep Application Class ====================
--keep class com.alhaq.amnshield.DeenShield { *; }
+-keep class com.alhaq.amnshield.AmnShield { *; }
 
 # ==================== Premium & Billing ====================
 -keep class com.alhaq.amnshield.premium.** { *; }

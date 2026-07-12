@@ -110,7 +110,7 @@ class UsageMetricsActivity : AppCompatActivity() {
         binding.avgAttentionStats.marker = markerViewAttention
 
         binding.shareStats.setOnClickListener {
-            binding.btnDigiWelbeing.text = "Tracked Using DeenShield"
+            binding.btnDigiWelbeing.text = "Tracked Using AmnShield"
 
             markerViewReel.visibility = View.GONE
             val screenshotFile = captureScreenshot(binding.linearSharePic)
