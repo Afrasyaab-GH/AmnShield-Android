@@ -1,8 +1,14 @@
 # AmnShield Roadmap
 
-Last updated: 2026-05-29
+Last updated: 2026-07-12
 
 ## Recently Completed
+- **Monetization & Licensing Track (July 2026)**
+  - Configured custom build-flavor partitioning via `IS_PLAYSTORE` BuildConfig flags.
+  - Implemented offline-first ECDSA cryptographic license validator on client builds.
+  - Built Deno/TypeScript Supabase Edge Function to parse and verification sign Lemon Squeezy orders.
+  - Upgraded Android client to use a versioned keyring map supporting key rotation.
+  - Created automated regression test suites verifying signature, expiration, and payload-tamper checks.
 - Replaced bottom navigation Settings tab with Blocks dashboard tab
 - Added unified Blocks dashboard with live status cards:
   - App Blocker
@@ -36,6 +42,7 @@ Last updated: 2026-05-29
 ## Current Stabilization Goals
 - [x] Blocks dashboard UX clarity improvements
 - [x] Docs baseline sync (nav model, broadcasts, test scenarios)
+- [x] Hybrid monetization architecture implemented (Play Billing + Serverless ECDSA Licensing)
 - [ ] Expand end-to-end tests for schedules/groups and launch-limit flows on device
 - [ ] Validate migration behavior for users upgrading from older nav layouts
 

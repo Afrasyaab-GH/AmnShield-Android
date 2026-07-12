@@ -95,3 +95,17 @@ To verify that F-Droid's build server won't run into errors, you can test it usi
    ```
 2. Open a **Merge Request** on the upstream GitLab repo ([fdroid/fdroiddata](https://gitlab.com/fdroid/fdroiddata)).
 3. F-Droid maintainers will review the submission, run automated checks, and merge your request. Once merged, F-Droid build servers will automatically compile the app and publish it to the official F-Droid store!
+
+---
+
+## 💰 F-Droid Monetization & Premium Verification
+
+F-Droid has a strict policy against including proprietary libraries (such as Google Play Billing). To monetize the F-Droid distribution without violating F-Droid policies, AmnShield uses a **Serverless, Offline-First Cryptographic Licensing Model**:
+
+### How it Works:
+1. **Exclusion of Play Billing:** The `fdroid` product flavor excludes all Billing library dependencies at compile time (`IS_PLAYSTORE = false`).
+2. **External Checkout:** Users purchase premium access externally via our checkout page (handled by Lemon Squeezy).
+3. **Webhook signature & Sign-off:** Lemon Squeezy fires a webhook to a **Supabase Edge Function**. The Edge Function verifies the webhook signature and signs the user's email address and license expiration date using an **ECDSA Private Key (NIST P-256)**.
+4. **Key Delivery:** The signed key is formatted as `Base64(Payload).Base64(Signature)` and emailed to the user.
+5. **Offline Validation:** The user copies and pastes this license string into the AmnShield app's Profile page. The app decodes the payload, reads the schema version, retrieves the matching public key from its internal **Keyring**, and verifies the signature entirely offline. No network requests are made by the app to validate premium status.
+
