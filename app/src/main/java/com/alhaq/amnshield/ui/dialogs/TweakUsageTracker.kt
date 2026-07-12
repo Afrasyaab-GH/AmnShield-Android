@@ -24,8 +24,6 @@ class TweakUsageTracker(
         // Load tracker preferences
         trackerPreferences =
             requireContext().getSharedPreferences("config_tracker", Context.MODE_PRIVATE)
-        dialogConfigurationTracker.cbReelCounter.isChecked =
-            trackerPreferences.getBoolean("is_reel_counter", true)
         dialogConfigurationTracker.cbTimeElapsed.isChecked =
             trackerPreferences.getBoolean("is_time_elapsed", false)
 
@@ -37,10 +35,6 @@ class TweakUsageTracker(
 
                 // Save updated settings
                 with(trackerPreferences.edit()) {
-                    putBoolean(
-                        "is_reel_counter",
-                        dialogConfigurationTracker.cbReelCounter.isChecked
-                    )
                     putBoolean(
                         "is_time_elapsed",
                         dialogConfigurationTracker.cbTimeElapsed.isChecked

@@ -51,10 +51,6 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
         const val INTENT_ACTION_REFRESH_UNIFIED_FEATURE_SCHEDULES = "amnshield.refresh.unified.feature.schedules"
         const val INTENT_ACTION_REFRESH_ANTI_UNINSTALL = ".amnshield.refresh.anti_uninstall"
         const val INTENT_ACTION_PASSWORD_VERIFIED = "amnshield.password.verified"
-
-        private const val REEL_TRACKER_SCROLL_DEBOUNCE_MS = 800L
-        private const val REEL_TRACKER_DUPLICATE_WINDOW_MS = 2_500L
-        private const val REEL_TRACKER_SURFACE_REENTRY_MS = 10 * 60 * 1000L
         private const val UNIFIED_SCHEDULE_EVAL_INTERVAL_MS = 15_000L
     }
 
@@ -85,12 +81,7 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
     private var lastPasswordVerificationTime = 0L
     private val PASSWORD_VERIFICATION_COOLDOWN = 5 * 60 * 1000L
     private var isPasswordVerified = false
-    private var lastReelCountRefreshTime = 0L
     private var lastUnifiedScheduleEvalTime = 0L
-    private var cachedReelsScrolledToday = 0
-    private var reelTrackerDate = TimeTools.getCurrentDate()
-    private val lastReelTrackerHitTimes = mutableMapOf<String, Long>()
-    private val lastReelTrackerSignatures = mutableMapOf<String, String>()
     private var cachedDefaultLauncher: String? = null
 
     private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -284,14 +275,6 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
 
             if (premiumManager.isPremium()) {
                 try {
-                    refreshReelCountCacheIfNeeded()
-                    reelBlocker.reelsScrolledToday = cachedReelsScrolledToday
-
-                    val detectedReelSurface = reelBlocker.detectReelSurfaceId(rootNode, packageName)
-                    if (detectedReelSurface != null) {
-                        trackReelExposure(packageName, detectedReelSurface, event)
-                    }
-
                     val reelBlockerResult = reelBlocker.doesReelNeedToBeBlocked(rootNode, packageName)
                     if (reelBlockerResult != null && reelBlockerResult.isBlocked) {
                         blockingStatsManager.recordViewBlock(packageName, reelBlockerResult.viewId)
@@ -440,56 +423,6 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
 
         reelBlocker.restoreCooldowns(savedPreferencesLoader.loadReelBlockerCooldownData())
         savedPreferencesLoader.saveReelBlockerCooldownData(reelBlocker.getCooldownSnapshot())
-        refreshReelCountCacheIfNeeded(force = true)
-        reelBlocker.reelsScrolledToday = cachedReelsScrolledToday
-    }
-
-    private fun refreshReelCountCacheIfNeeded(force: Boolean = false) {
-        val now = System.currentTimeMillis()
-        if (!force && (now - lastReelCountRefreshTime) < 15_000) {
-            return
-        }
-
-        val todayKey = TimeTools.getCurrentDate()
-        cachedReelsScrolledToday = savedPreferencesLoader.getReelsScrolled()[todayKey] ?: 0
-        lastReelCountRefreshTime = now
-    }
-
-    private fun trackReelExposure(packageName: String, surfaceId: String, event: AccessibilityEvent) {
-        if (!savedPreferencesLoader.isUsageTrackerFeatureEnabled()) {
-            return
-        }
-
-        val trackerPrefs = getSharedPreferences("config_tracker", Context.MODE_PRIVATE)
-        if (!trackerPrefs.getBoolean("is_reel_counter", true)) {
-            return
-        }
-
-        val today = TimeTools.getCurrentDate()
-        if (reelTrackerDate != today) {
-            reelTrackerDate = today
-            lastReelTrackerHitTimes.clear()
-            lastReelTrackerSignatures.clear()
-        }
-
-        val key = "$packageName|$surfaceId"
-        val now = System.currentTimeMillis()
-        if (!shouldTrackReelExposure(event, key, now)) {
-            return
-        }
-        lastReelTrackerHitTimes[key] = now
-
-        val reelsData = savedPreferencesLoader.getReelsScrolled()
-        val currentCount = reelsData[today] ?: 0
-        val updatedCount = currentCount + 1
-        reelsData[today] = updatedCount
-        savedPreferencesLoader.saveReelsScrolled(reelsData)
-
-        cachedReelsScrolledToday = updatedCount
-        lastReelCountRefreshTime = now
-
-        val legacyMetricsPrefs = getSharedPreferences("usage_metrics", Context.MODE_PRIVATE)
-        legacyMetricsPrefs.edit { putInt("total_reels", updatedCount) }
     }
 
     private fun trackAppLaunch(packageName: String) {
@@ -512,39 +445,6 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
         }
     }
 
-    private fun shouldTrackReelExposure(event: AccessibilityEvent, key: String, now: Long): Boolean {
-        val lastSeen = lastReelTrackerHitTimes[key]
-        if (lastSeen == null) {
-            lastReelTrackerSignatures[key] = buildReelTrackerSignature(event)
-            return true
-        }
-
-        return when (event.eventType) {
-            AccessibilityEvent.TYPE_VIEW_SCROLLED -> {
-                val elapsed = now - lastSeen
-                if (elapsed < REEL_TRACKER_SCROLL_DEBOUNCE_MS) return false
-
-                val signature = buildReelTrackerSignature(event)
-                val lastSignature = lastReelTrackerSignatures[key]
-                if (signature == lastSignature && elapsed < REEL_TRACKER_DUPLICATE_WINDOW_MS) {
-                    return false
-                }
-
-                lastReelTrackerSignatures[key] = signature
-                true
-            }
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
-            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
-                (now - lastSeen) >= REEL_TRACKER_SURFACE_REENTRY_MS
-            }
-            else -> false
-        }
-    }
-
-    private fun buildReelTrackerSignature(event: AccessibilityEvent): String {
-        return "${event.eventType}|${event.fromIndex}|${event.toIndex}|${event.itemCount}|" +
-            "${event.scrollX}|${event.scrollY}|${event.maxScrollX}|${event.maxScrollY}|${event.contentChangeTypes}"
-    }
 
     private fun setupFocusMode() {
         val focusModeData = savedPreferencesLoader.getFocusModeData()

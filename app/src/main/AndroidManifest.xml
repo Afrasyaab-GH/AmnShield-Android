@@ -46,9 +46,7 @@
         <activity
             android:name=".ui.activity.FragmentActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.activity.UsageMetricsActivity"
-            android:exported="false" />
+
         <activity
             android:name=".ui.activity.TimedActionActivity"
             android:exported="false" />
@@ -127,17 +125,7 @@
         <meta-data android:name="android.app.shortcuts"
             android:resource="@xml/shortcuts" />
 
-        <receiver android:name=".ui.widgets.ReelsWidgetProvider"
-            android:label="Reel Stats"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.alhaq.amnshield.reels.WIDGET_REFRESH" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_reels_metadata" />
-        </receiver>
+
 
 
         <receiver android:name=".ui.widgets.ScreentimeWidgetProvider"

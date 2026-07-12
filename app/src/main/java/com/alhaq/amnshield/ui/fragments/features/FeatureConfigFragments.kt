@@ -423,9 +423,6 @@ class UsageTrackerConfigFragment : BaseFeatureFragment() {
             selectOverlayAppsLauncher.launch(intent, activityOptions)
         }
 
-        binding.btnViewMetrics.setOnClickListener {
-            val intent = Intent(requireContext(), com.alhaq.amnshield.ui.activity.UsageMetricsActivity::class.java)
-            startActivity(intent, activityOptions.toBundle())
         }
 
         return binding.root
@@ -434,7 +431,6 @@ class UsageTrackerConfigFragment : BaseFeatureFragment() {
     private fun setUsageTrackerControlsEnabled(enabled: Boolean) {
         binding.btnTrackerToggles.isEnabled = enabled
         binding.btnSelectOverlayApps.isEnabled = enabled
-        binding.btnViewMetrics.isEnabled = enabled
     }
     
     override fun onDestroyView() {

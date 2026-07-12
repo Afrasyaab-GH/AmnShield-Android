@@ -32,7 +32,6 @@ class ReportsActivity : AppCompatActivity() {
     private lateinit var btnNextDay: MaterialButton
     private lateinit var chipTotalBlocks: Chip
     private lateinit var chipFocusTime: Chip
-    private lateinit var chipReelsScrolled: Chip
     private lateinit var txtUsageRecommendation: TextView
     private var topRiskyAppName: String? = null
 
@@ -61,7 +60,6 @@ class ReportsActivity : AppCompatActivity() {
             btnNextDay = findViewById(R.id.btn_next_day)
             chipTotalBlocks = findViewById(R.id.chip_total_blocks)
             chipFocusTime = findViewById(R.id.chip_focus_time)
-            chipReelsScrolled = findViewById(R.id.chip_reels_scrolled)
             txtUsageRecommendation = findViewById(R.id.txt_usage_recommendation)
 
             btnPrevDay.setOnClickListener {
@@ -127,10 +125,6 @@ class ReportsActivity : AppCompatActivity() {
             val focusMin = summary.totalFocusMinutes
             chipFocusTime.text = if (focusMin >= 60) "${focusMin / 60}h ${focusMin % 60}m focus" else "${focusMin}m focus"
 
-            val reelsData = SavedPreferencesLoader(this).getReelsScrolled()
-            val reelsToday = reelsData[currentDate.toString()] ?: 0
-            chipReelsScrolled.text = "$reelsToday reels"
-
             refreshUsageRecommendation()
         } catch (t: Throwable) {
             android.util.Log.e("ReportsActivity", "refreshReports failed", t)
@@ -138,7 +132,6 @@ class ReportsActivity : AppCompatActivity() {
             reportsRecyclerView.adapter = ReportsAdapter(emptyList())
             chipTotalBlocks.text = "0 blocks"
             chipFocusTime.text = "0m focus"
-            chipReelsScrolled.text = "0 reels"
             txtUsageRecommendation.text = "Could not calculate app usage recommendation for this day."
             android.widget.Toast.makeText(
                 this,

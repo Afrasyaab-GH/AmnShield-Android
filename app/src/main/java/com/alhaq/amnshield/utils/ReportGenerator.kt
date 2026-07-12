@@ -35,7 +35,6 @@ class ReportGenerator(private val context: Context) {
         val events = statsManager.getBlockEventsForDate(date)
         val focusSessions = statsManager.getFocusSessionsForDate(date)
         val prevFocusSessions = statsManager.getFocusSessionsForDate(prevDate)
-        val reelsData = savedPreferencesLoader.getReelsScrolled()
 
         // App Blocker Report
         reports.add(generateAppBlockerReport(summary.appBlocksCount, prevSummary.appBlocksCount, events))
@@ -50,14 +49,7 @@ class ReportGenerator(private val context: Context) {
         reports.add(generateKeywordBlockerReport(summary.keywordBlocksCount, prevSummary.keywordBlocksCount, events))
 
         // Shorts Blocker Report (view/reel blocks)
-        reports.add(generateViewBlockerReport(summary.viewBlocksCount, prevSummary.viewBlocksCount, events, date, reelsData))
-
-        // Reel Tracker Report (passive reel scroll tracking)
-        val todayReels = reelsData[date.toString()] ?: 0
-        val prevReels = reelsData[prevDate.toString()] ?: 0
-        if (todayReels > 0 || prevReels > 0) {
-            reports.add(generateReelTrackerReport(date, reelsData))
-        }
+        reports.add(generateViewBlockerReport(summary.viewBlocksCount, prevSummary.viewBlocksCount, events))
 
         return reports
     }
@@ -189,12 +181,9 @@ class ReportGenerator(private val context: Context) {
     private fun generateViewBlockerReport(
         count: Int,
         prevCount: Int,
-        events: List<BlockingStatsManager.BlockEvent>,
-        date: LocalDate,
-        reelsData: Map<String, Int>
+        events: List<BlockingStatsManager.BlockEvent>
     ): Report {
         val viewBlockEvents = events.filter { it.type == BlockingStatsManager.BlockType.VIEW_REEL_BLOCK }
-        val reelsTracked = reelsData[date.toString()] ?: 0
 
         val detailedStats = mutableListOf<ReportDetail>()
 
@@ -211,13 +200,8 @@ class ReportGenerator(private val context: Context) {
             }
         }
 
-        if (reelsTracked > 0) {
-            detailedStats.add(ReportDetail("Reels Scrolled (Tracked)", reelsTracked.toString()))
-        }
-
         val summary = when {
-            count == 0 && reelsTracked == 0 -> "No shorts or reels blocked today."
-            count == 0 -> "No reels blocked. Tracked $reelsTracked reels scrolled."
+            count == 0 -> "No shorts or reels blocked today."
             count == 1 -> "Blocked 1 reel/short today."
             else -> "Blocked $count reels/shorts today."
         }
@@ -230,46 +214,6 @@ class ReportGenerator(private val context: Context) {
             type = com.alhaq.amnshield.ui.dto.ReportType.VIEW_BLOCKER,
             detailedStats = detailedStats,
             additionalInfo = if (count > 0) "Saved you from time-wasting short-form content." else null
-        )
-    }
-
-    private fun generateReelTrackerReport(date: LocalDate, reelsData: Map<String, Int>): Report {
-        val todayCount = reelsData[date.toString()] ?: 0
-        val prevCount = reelsData[date.minusDays(1).toString()] ?: 0
-
-        val detailedStats = mutableListOf<ReportDetail>()
-
-        // Last 7 days breakdown
-        val formatter = DateTimeFormatter.ofPattern("EEE, MMM d")
-        for (i in 6 downTo 0) {
-            val d = date.minusDays(i.toLong())
-            val count = reelsData[d.toString()] ?: 0
-            if (count > 0 || i == 0) {
-                val label = if (i == 0) "Today" else d.format(formatter)
-                detailedStats.add(ReportDetail(label, "$count reels"))
-            }
-        }
-
-        val weekTotal = (0 until 7).sumOf { i -> reelsData[date.minusDays(i.toLong()).toString()] ?: 0 }
-        if (weekTotal > 0) {
-            detailedStats.add(ReportDetail("7-Day Total", "$weekTotal reels"))
-            detailedStats.add(ReportDetail("Daily Average", "${weekTotal / 7} reels"))
-        }
-
-        val summary = when {
-            todayCount == 0 -> "No reels tracked today."
-            todayCount == 1 -> "Scrolled 1 reel today."
-            else -> "Scrolled $todayCount reels today."
-        }
-
-        return Report(
-            title = "Reel Tracker",
-            summary = summary,
-            count = todayCount,
-            yesterdayCount = prevCount,
-            type = com.alhaq.amnshield.ui.dto.ReportType.REEL_TRACKER,
-            detailedStats = detailedStats,
-            additionalInfo = if (todayCount > 20) "High reel usage — consider setting a daily limit." else null
         )
     }
     

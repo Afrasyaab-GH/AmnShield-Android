@@ -69,14 +69,6 @@ class StatsFragment : Fragment() {
             startActivity(intent, options.toBundle())
         }
 
-        binding.btnViewReelsStats.setOnClickListener {
-            val intent = Intent(requireContext(), UsageMetricsActivity::class.java)
-            val options = ActivityOptionsCompat.makeCustomAnimation(
-                requireContext(),
-                com.alhaq.amnshield.R.anim.fade_in,
-                com.alhaq.amnshield.R.anim.fade_out
-            )
-            startActivity(intent, options.toBundle())
         }
 
         binding.btnViewReports.setOnClickListener {
@@ -127,18 +119,6 @@ class StatsFragment : Fragment() {
                         val statsList = usageStatsHelper.getForegroundStatsByTimestamps(startTime, endTime)
                         val totalTime = statsList.sumOf { it.totalTime }
 
-                        // Get yesterday's reels count for comparison
-                        val reelsData = savedPreferencesLoader.getReelsScrolled()
-                        val todayDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-                        val reelsToday = reelsData[todayDate] ?: 0
-                        val yesterdayDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).let { formatter ->
-                            val yesterdayCal = Calendar.getInstance().apply {
-                                add(Calendar.DAY_OF_YEAR, -1)
-                            }
-                            formatter.format(yesterdayCal.time)
-                        }
-                        val yesterdayReels = reelsData[yesterdayDate] ?: 0
-
                         // Get top 3 apps
                         val sortedApps = statsList.sortedByDescending { it.totalTime }.take(3)
 
@@ -148,23 +128,6 @@ class StatsFragment : Fragment() {
                             val minutes = (totalTime % (1000 * 60 * 60)) / (1000 * 60)
                             binding.txtScreenTime.text = "${hours}h ${minutes}m"
 
-                            // Update reels count
-                            binding.txtReelsCount.text = reelsToday.toString()
-
-                            // Calculate percentage change and color-code
-                            val percentage = if (yesterdayReels > 0) {
-                                ((reelsToday - yesterdayReels).toFloat() / yesterdayReels * 100).toInt()
-                            } else {
-                                0
-                            }
-                            binding.txtReelsPercentage.text = if (percentage >= 0) "+$percentage%" else "$percentage%"
-                            // Red = more reels (worse), Green = fewer reels (better)
-                            val pctColor = if (percentage <= 0)
-                                ContextCompat.getColor(requireContext(), R.color.md_theme_primary)
-                            else
-                                ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
-                            binding.txtReelsPercentage.setTextColor(pctColor)
-
                             // Update daily report summary with live blocking stats
                             val blockStats = BlockingStatsManager.getInstance(ctx).getTodayStats()
                             val totalBlocks = blockStats.appBlocksCount + blockStats.keywordBlocksCount + blockStats.viewBlocksCount
@@ -172,7 +135,6 @@ class StatsFragment : Fragment() {
                             if (totalBlocks > 0) summaryParts.add("$totalBlocks blocks")
                             if (blockStats.focusSessionsCount > 0) summaryParts.add("${blockStats.focusSessionsCount} focus sessions")
                             if (blockStats.totalFocusMinutes > 0) summaryParts.add("${formatMinutes(blockStats.totalFocusMinutes)} focus time")
-                            if (reelsToday > 0) summaryParts.add("$reelsToday reels scrolled")
                             binding.dailyReportSummary.text = if (summaryParts.isNotEmpty()) {
                                 summaryParts.joinToString(" · ")
                             } else {
@@ -225,8 +187,6 @@ class StatsFragment : Fragment() {
                     }
                 } catch (t: Throwable) {
                     binding.txtScreenTime.text = "0h 0m"
-                    binding.txtReelsCount.text = "0"
-                    binding.txtReelsPercentage.text = "0%"
                     binding.dailyReportSummary.text = "Stats unavailable. Tap Refresh below."
                     binding.txtTopApp1.text = "1. No usage yet"
                     binding.txtTopApp2.text = "2. No usage yet"

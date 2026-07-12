@@ -7,16 +7,7 @@
     android:orientation="vertical"
     android:padding="@dimen/padding_normal">
 
-    <TextView
-        android:id="@+id/reel_counter"
-        style="@style/TextAppearance.Material3.HeadlineLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:textSize="96sp"
-        android:visibility="gone"
-        android:alpha="0.8"
-        tool:text="38" />
+
 
     <TextView
         android:id="@+id/time_elapsed_txt"

@@ -332,36 +332,6 @@ class SavedPreferencesLoader(private val context: Context) {
         }
     }
 
-    fun saveReelsScrolled(reelsData: MutableMap<String, Int>) {
-        val sharedPreferences =
-            context.getSharedPreferences("attention_span_data", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val gson = Gson()
-
-        val json = gson.toJson(reelsData)
-
-        editor.putString("reels_data", json)
-        editor.apply()
-    }
-
-    fun getReelsScrolled(): MutableMap<String, Int> {
-        val sharedPreferences =
-            context.getSharedPreferences("attention_span_data", Context.MODE_PRIVATE)
-        val gson = Gson()
-
-        val json = sharedPreferences.getString("reels_data", null)
-
-        if (json.isNullOrEmpty()) return mutableMapOf()
-
-        val type =
-            object : TypeToken<MutableMap<String, Int>>() {}.type
-        return runCatching {
-            gson.fromJson<MutableMap<String, Int>>(json, type) ?: mutableMapOf()
-        }.getOrElse {
-            Log.e("SavedPreferencesLoader", "Failed to load reels scrolled data", it)
-            mutableMapOf()
-        }
-    }
 
     fun saveFocusModeData(focusModeData: FocusModeBlocker.FocusModeData) {
         val sharedPreferences =
