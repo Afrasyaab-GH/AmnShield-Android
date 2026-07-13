@@ -104,6 +104,24 @@ object AmnShieldApiCommands {
                     true
                 }
 
+                ApiCommand.SET_SOCIAL_MEDIA_BLOCKER -> {
+                    if (target.isNotEmpty()) {
+                        if (target.contains(".") && (target.startsWith("com.") || target.startsWith("org.") || target.startsWith("net."))) {
+                            val apps = loader.loadBlockedSocialApps().toMutableSet()
+                            if (enable) apps.add(target) else apps.remove(target)
+                            loader.saveBlockedSocialApps(apps)
+                        } else {
+                            val sites = loader.loadBlockedSocialWebsites().toMutableSet()
+                            if (enable) sites.add(target) else sites.remove(target)
+                            loader.saveBlockedSocialWebsites(sites)
+                        }
+                    } else {
+                        loader.setSocialMediaBlockerEnabled(enable)
+                    }
+                    broadcast(context, "amnshield.refresh.appblocker")
+                    true
+                }
+
                 ApiCommand.SET_GRAYSCALE_GROUP -> {
                     if (target.isNotEmpty()) {
                         val apps = loader.loadGrayScaleApps().toMutableSet()
@@ -198,6 +216,7 @@ object AmnShieldApiCommands {
                         "app_blocker_enabled" to loader.isAppBlockerFeatureEnabled(),
                         "keyword_blocker_enabled" to loader.isKeywordBlockerFeatureEnabled(),
                         "reel_blocker_enabled" to loader.isReelBlockerEnabled(),
+                        "social_media_blocker_enabled" to loader.isSocialMediaBlockerEnabled(),
                         "focus_active" to (focusData.isTurnedOn && focusData.endTime > System.currentTimeMillis())
                     )
                 }

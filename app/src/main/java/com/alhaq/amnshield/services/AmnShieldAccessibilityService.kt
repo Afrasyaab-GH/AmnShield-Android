@@ -200,6 +200,20 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
             val isFocusModeActive = isPremiumUser && savedPreferencesLoader.isFocusModeFeatureEnabled() && focusModeBlocker.focusModeData.isTurnedOn
             val isFocusBlockAllExSelectedActive = isFocusModeActive && focusModeBlocker.focusModeData.modeType == Constants.FOCUS_MODE_BLOCK_ALL_EX_SELECTED
 
+            if (isPremiumUser && savedPreferencesLoader.isSocialMediaBlockerEnabled()) {
+                val blockedSocialApps = savedPreferencesLoader.loadBlockedSocialApps()
+                if (blockedSocialApps.contains(packageName)) {
+                    blockingStatsManager.recordAppBlock(packageName, "Blocked by Social Media Blocker")
+                    val intent = Intent(this, WarningActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        putExtra("mode", Constants.WARNING_SCREEN_MODE_APP_BLOCKER)
+                        putExtra("result_id", packageName)
+                    }
+                    startActivity(intent)
+                    return
+                }
+            }
+
             if (!isFocusBlockAllExSelectedActive) {
                 if (isPremiumUser && savedPreferencesLoader.isAppBlockerFeatureEnabled()) {
                     val appBlockerResult = appBlocker.doesAppNeedToBeBlocked(packageName, savedPreferencesLoader)
@@ -276,6 +290,18 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
                     }
                 } catch (e: Exception) {
                     android.util.Log.e("AmnShield", "Core Keyword blocker error", e)
+                }
+            }
+
+            if (premiumManager.isPremium() && savedPreferencesLoader.isSocialMediaBlockerEnabled()) {
+                try {
+                    if (checkBlockedSocialWebsites(rootNode, packageName)) {
+                        blockingStatsManager.recordAppBlock(packageName, "Social Website Blocked: $packageName")
+                        pressHome()
+                        return
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("AmnShield", "Social Media website blocker error", e)
                 }
             }
 
@@ -993,6 +1019,43 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         startActivity(intent)
+    }
+
+    private val BROWSER_URL_BAR_IDS = mapOf(
+        "com.android.chrome" to "url_bar",
+        "com.chrome.beta" to "url_bar",
+        "com.chrome.dev" to "url_bar",
+        "com.chrome.canary" to "url_bar",
+        "com.brave.browser" to "url_bar",
+        "com.microsoft.emmx" to "url_bar",
+        "com.sec.android.app.sbrowser" to "location_bar_edit_text",
+        "org.mozilla.firefox" to "mozac_browser_toolbar_url_view",
+        "org.mozilla.focus" to "mozac_browser_toolbar_url_view",
+        "com.opera.browser" to "url_field",
+        "com.opera.mini.native" to "url_field",
+        "com.duckduckgo.mobile.android" to "omnibarTextInput",
+        "com.vivaldi.browser" to "url_bar",
+        "com.kiwibrowser.browser" to "url_bar"
+    )
+
+    private fun checkBlockedSocialWebsites(rootNode: AccessibilityNodeInfo, packageName: String): Boolean {
+        val urlBarId = BROWSER_URL_BAR_IDS[packageName] ?: return false
+        val fullId = "$packageName:id/$urlBarId"
+        val urlNode = ViewBlocker.findElementById(rootNode, fullId) ?: return false
+        return try {
+            val urlText = urlNode.text?.toString()?.lowercase(java.util.Locale.ROOT).orEmpty()
+            if (urlText.isNotBlank()) {
+                val blockedWebsites = savedPreferencesLoader.loadBlockedSocialWebsites()
+                for (site in blockedWebsites) {
+                    if (urlText.contains(site)) {
+                        return true
+                    }
+                }
+            }
+            false
+        } finally {
+            urlNode.recycle()
+        }
     }
 
     override fun onInterrupt() {

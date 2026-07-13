@@ -47,6 +47,7 @@ class BlocksFragment : BaseFeatureFragment() {
 
     private fun setupClicks() {
         binding.cardAppBlocker.setOnClickListener { openFeatureConfig("app_blocker", requiresPremium = true) }
+        binding.cardSocialMediaBlocker.setOnClickListener { openFeatureConfig("social_media_blocker", requiresPremium = true) }
         binding.cardKeywordBlocker.setOnClickListener { openFeatureConfig("keyword_blocker", requiresPremium = false) }
         binding.cardFocusMode.setOnClickListener { openFeatureConfig("focus_mode", requiresPremium = true) }
         binding.cardCheatHours.setOnClickListener { openCheatHours() }
@@ -73,6 +74,12 @@ class BlocksFragment : BaseFeatureFragment() {
         val focusActive = premiumEnabled && focusData.isTurnedOn && serviceEnabled
         updateStatus(binding.chipFocusModeStatus, focusActive, if (focusActive) getString(R.string.on) else getString(R.string.off))
 
+        val socialAppsCount = blocksLoader.loadBlockedSocialApps().size
+        val socialWebsitesCount = blocksLoader.loadBlockedSocialWebsites().size
+        val socialActive = premiumEnabled && blocksLoader.isSocialMediaBlockerEnabled() && serviceEnabled
+        val socialLabel = if (socialAppsCount > 0 || socialWebsitesCount > 0) "$socialAppsCount apps, $socialWebsitesCount sites" else getString(R.string.off)
+        updateStatus(binding.chipSocialMediaBlockerStatus, socialActive, socialLabel)
+
         val allSchedules = blocksLoader.loadAppBlockerScheduleRules()
         val cheatCount = allSchedules.count { it.type == AppBlockScheduleRule.RuleType.CHEAT }
         val scheduleCount = allSchedules.count { it.type == AppBlockScheduleRule.RuleType.BLOCK }
@@ -82,7 +89,7 @@ class BlocksFragment : BaseFeatureFragment() {
         updateCountStatus(binding.chipSchedulesStatus, scheduleCount, "${scheduleCount} rules")
         updateCountStatus(binding.chipLaunchLimitsStatus, launchLimitCount, "${launchLimitCount} limits")
 
-        val activeCount = listOf(appActive, keywordActive, focusActive, cheatCount > 0, scheduleCount > 0, launchLimitCount > 0).count { it }
+        val activeCount = listOf(appActive, keywordActive, focusActive, socialActive, cheatCount > 0, scheduleCount > 0, launchLimitCount > 0).count { it }
         
         context?.let { ctx ->
             if (activeCount > 0) {
@@ -149,7 +156,8 @@ class BlocksFragment : BaseFeatureFragment() {
             getString(R.string.keyword_blocker),
             getString(R.string.focus_mode),
             getString(R.string.manage_block_schedules),
-            getString(R.string.manage_launch_limits)
+            getString(R.string.manage_launch_limits),
+            getString(R.string.social_media_blocker)
         )
 
         MaterialAlertDialogBuilder(requireContext())
@@ -161,6 +169,7 @@ class BlocksFragment : BaseFeatureFragment() {
                     2 -> openFeatureConfig("focus_mode", requiresPremium = true)
                     3 -> openSchedules()
                     4 -> openLaunchLimits()
+                    5 -> openFeatureConfig("social_media_blocker", requiresPremium = true)
                 }
             }
             .setNegativeButton(android.R.string.cancel, null)

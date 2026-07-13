@@ -41,6 +41,7 @@ class FragmentActivity : AppCompatActivity() {
                 // "view_blocker" was consolidated into Reel Blocker; route removed to
                 // avoid resurrecting the deprecated config screen via legacy intents.
                 "reel_blocker" -> com.alhaq.amnshield.ui.fragments.features.ReelBlockerConfigFragment()
+                "social_media_blocker" -> com.alhaq.amnshield.ui.fragments.features.SocialMediaBlockerConfigFragment()
                 "usage_tracker" -> com.alhaq.amnshield.ui.fragments.features.UsageTrackerConfigFragment()
                 "keyword_blocker" -> com.alhaq.amnshield.ui.fragments.features.KeywordBlockerConfigFragment()
                 "anti_uninstall" -> ChooseModeFragment()

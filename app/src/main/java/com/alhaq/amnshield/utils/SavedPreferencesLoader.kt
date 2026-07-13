@@ -926,6 +926,48 @@ class SavedPreferencesLoader(private val context: Context) {
         sharedPreferences.edit().putBoolean("adult_blocker", enabled).apply()
     }
 
+    fun isSocialMediaBlockerEnabled(defaultValue: Boolean = false): Boolean {
+        val sharedPreferences = context.getSharedPreferences("social_media_blocker", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean("is_enabled", defaultValue)
+    }
+
+    fun setSocialMediaBlockerEnabled(enabled: Boolean) {
+        val sharedPreferences = context.getSharedPreferences("social_media_blocker", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("is_enabled", enabled).apply()
+    }
+
+    fun loadBlockedSocialApps(): Set<String> {
+        val sharedPreferences = context.getSharedPreferences("social_media_blocker", Context.MODE_PRIVATE)
+        val hasKey = sharedPreferences.contains("blocked_apps")
+        if (!hasKey) {
+            val defaults = setOf("com.instagram.android", "com.sec.android.app.sbrowser")
+            sharedPreferences.edit().putStringSet("blocked_apps", defaults).apply()
+            return defaults
+        }
+        return sharedPreferences.getStringSet("blocked_apps", emptySet()) ?: emptySet()
+    }
+
+    fun saveBlockedSocialApps(apps: Set<String>) {
+        val sharedPreferences = context.getSharedPreferences("social_media_blocker", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putStringSet("blocked_apps", apps).apply()
+    }
+
+    fun loadBlockedSocialWebsites(): Set<String> {
+        val sharedPreferences = context.getSharedPreferences("social_media_blocker", Context.MODE_PRIVATE)
+        val hasKey = sharedPreferences.contains("blocked_websites")
+        if (!hasKey) {
+            val defaults = setOf("facebook.com", "fb.com", "fb.watch")
+            sharedPreferences.edit().putStringSet("blocked_websites", defaults).apply()
+            return defaults
+        }
+        return sharedPreferences.getStringSet("blocked_websites", emptySet()) ?: emptySet()
+    }
+
+    fun saveBlockedSocialWebsites(websites: Set<String>) {
+        val sharedPreferences = context.getSharedPreferences("social_media_blocker", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putStringSet("blocked_websites", websites).apply()
+    }
+
     /**
      * Data class to track launch count with timestamp for period-based reset logic
      */
