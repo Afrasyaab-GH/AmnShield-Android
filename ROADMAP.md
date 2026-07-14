@@ -3,6 +3,11 @@
 Last updated: 2026-07-13
 
 ## Recently Completed
+- **Social Media Blocker Integration & Consolidation (July 2026)**
+  - Re-implemented the dedicated Social Media Blocker screen matching design requirements (enabling global switch, managing blocked apps, and adding custom blocked websites/domains).
+  - Consolidated gaming blocker into general App Blocker to clean up duplicate features.
+  - Enforced blocking rules in `AmnShieldAccessibilityService` to intercept blocked social media apps and browser domains.
+  - Linked companion app via bound service API to support `SET_SOCIAL_MEDIA_BLOCKER` command for Guardian-based rule enforcement.
 - **Scheduling System Consolidation (July 2026)**
   - Consolidated legacy timed scheduling systems (Cheat Hours, Auto-Focus, and Reel Blocker slider ranges) into the unified schedules framework.
   - Retired the redundant `TimedActionActivity`, `AutoTimedActionItem` data model, and custom slider dialogs.

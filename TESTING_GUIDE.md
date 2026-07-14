@@ -15,6 +15,7 @@
 | Launch Limits | Expanded | Test 16 |
 | Error Reporting | Expanded | Test 17 |
 | Blocks Dashboard | Expanded | Test 18 (see below) |
+| Social Media Blocker | Complete | Test 19 (see below) |
 
 ### Navigation Sanity Check
 1. Open app and verify bottom navigation shows: **Home, Stats, Blocks, Profile**
@@ -537,6 +538,24 @@ Export available: CSV, TXT
 - Logs are stored locally only.
 - Export is user-initiated.
 - Delete action removes saved diagnostics/feedback artifacts.
+
+### Test 19: Social Media Blocker
+
+**Objective**: Verify Social Media Blocker setup, app selection, website domain additions, accessibility service enforcement, and companion app API synchronization.
+
+**Steps**:
+1. Open **Blocks** tab and enter **Social Media Blocker** config.
+2. Enable the **Social Media Blocker** toggle.
+3. Tap **Manage Apps** and select a social media app (e.g., Instagram).
+4. Enter a custom social domain (e.g., `facebook.com`) in the website block input and click **Add**.
+5. Launch the selected blocked app (Instagram).
+6. Open Chrome or any supported browser and navigate to `facebook.com`.
+7. Disable the blocker and verify app/website access is restored.
+
+**Expected Results**:
+- Selected app is immediately intercepted and redirects to the Warning Screen.
+- Blocked website domain is detected in the browser URL bar, causing the browser to immediately minimize/minimize to home.
+- Disabling the feature allows normal access to both the app and website.
 
 ---
 
