@@ -47,6 +47,12 @@ data class AmnShieldState(
     // Active theme
     val currentTheme: AppTheme = AppTheme.SUNSET_GLOW,
 
+    // System Status
+    val isMainServiceEnabled: Boolean = false,
+    val isPremiumUser: Boolean = false,
+    val isUsageTrackerEnabled: Boolean = false,
+    val isAntiUninstallEnabled: Boolean = false,
+
     // Core Protection Feature Switches
     val isAppBlockerEnabled: Boolean = true,
     val isReelsBlockerEnabled: Boolean = true,

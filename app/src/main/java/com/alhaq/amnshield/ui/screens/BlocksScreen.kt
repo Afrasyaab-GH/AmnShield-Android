@@ -5,8 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -32,7 +35,11 @@ fun BlocksScreen(
     onNavigateToFocusMode: () -> Unit = {},
     onNavigateToCheatHours: () -> Unit = {},
     onNavigateToSchedules: () -> Unit = {},
-    onNavigateToLaunchLimits: () -> Unit = {}
+    onNavigateToLaunchLimits: () -> Unit = {},
+    onNavigateToAntiUninstall: () -> Unit = {},
+    onNavigateToUsageTracker: () -> Unit = {},
+    onNavigateToReelsBlocker: () -> Unit = {},
+    onNavigateToPremium: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -41,6 +48,56 @@ fun BlocksScreen(
         verticalArrangement = Arrangement.spacedBy(20.dp),
         contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp)
     ) {
+        // Active protection summary card
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (state.isMainServiceEnabled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (state.isMainServiceEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (state.isMainServiceEnabled) Icons.Default.Shield else Icons.Default.Lock,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column {
+                        Text(
+                            text = if (state.isMainServiceEnabled) "Protection Active" else "Protection Disabled",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = if (state.isMainServiceEnabled) "All offline blocking shields are scanning." else "Please enable Accessibility Service.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+
         item {
             Text(
                 text = "CORE PROTECTION",
@@ -97,6 +154,20 @@ fun BlocksScreen(
                         statusText = if (state.isWebFilterEnabled) "ON" else "OFF",
                         onChecked = onNavigateToWebBlocker,
                         iconColor = Color(0xFFEC4899)
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
+
+                    BlockItemRow(
+                        icon = Icons.Outlined.VideoLibrary,
+                        title = "Reels Blocker",
+                        summary = "Block short-form video algorithms",
+                        statusText = if (state.isReelsBlockerEnabled) "ON" else "OFF",
+                        onChecked = onNavigateToReelsBlocker,
+                        iconColor = Color(0xFFF43F5E)
                     )
 
                     HorizontalDivider(
@@ -172,6 +243,66 @@ fun BlocksScreen(
                         statusText = if (state.isUsageLimitEnabled) "ON" else "0 limits",
                         onChecked = onNavigateToLaunchLimits,
                         iconColor = Color(0xFF8B5CF6)
+                    )
+                }
+            }
+        }
+
+        item {
+            Text(
+                text = "SYSTEM SETTINGS",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 0.8.sp
+            )
+        }
+
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            ) {
+                Column {
+                    BlockItemRow(
+                        icon = Icons.Outlined.Security,
+                        title = "Anti-Uninstall",
+                        summary = "Prevent app uninstallation",
+                        statusText = if (state.isAntiUninstallEnabled) "ON" else "OFF",
+                        onChecked = onNavigateToAntiUninstall,
+                        iconColor = Color(0xFF10B981)
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
+
+                    BlockItemRow(
+                        icon = Icons.Outlined.Analytics,
+                        title = "Usage Tracker",
+                        summary = "Track detailed screen time data",
+                        statusText = if (state.isUsageTrackerEnabled) "ON" else "OFF",
+                        onChecked = onNavigateToUsageTracker,
+                        iconColor = Color(0xFF0EA5E9)
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
+
+                    BlockItemRow(
+                        icon = Icons.Outlined.Star,
+                        title = "Premium Features",
+                        summary = if (state.isPremiumUser) "Premium Active" else "Upgrade to Premium",
+                        statusText = if (state.isPremiumUser) "ACTIVE" else "GET",
+                        onChecked = onNavigateToPremium,
+                        iconColor = Color(0xFFF59E0B)
                     )
                 }
             }

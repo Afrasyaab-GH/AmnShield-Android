@@ -53,7 +53,6 @@ import com.alhaq.amnshield.databinding.DialogPermissionInfoBinding
 import com.alhaq.amnshield.databinding.DialogRemoveAntiUninstallBinding
 import com.alhaq.amnshield.receivers.AdminReceiver
 import com.alhaq.amnshield.services.AmnShieldAccessibilityService
-import com.alhaq.amnshield.ui.fragments.HomeFragment
 import com.alhaq.amnshield.ui.fragments.BlocksFragment
 import com.alhaq.amnshield.ui.fragments.StatsFragment
 import com.alhaq.amnshield.ui.fragments.SettingsFragment
@@ -205,22 +204,16 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun setupFragmentNavigation(savedInstanceState: Bundle?) {
-        // Load HomeFragment by default
+        // Load StatsFragment by default
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.nav_host_fragment, HomeFragment())
+                .replace(R.id.nav_host_fragment, StatsFragment())
                 .commit()
-            binding.bottomNavigation.selectedItemId = R.id.navigation_home
+            binding.bottomNavigation.selectedItemId = R.id.navigation_stats
         }
         
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_home -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.nav_host_fragment, HomeFragment())
-                        .commit()
-                    true
-                }
                 R.id.navigation_stats -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment, StatsFragment())
@@ -665,12 +658,7 @@ class MainActivity : AppCompatActivity() {
 //        }
 //    }
 
-    private fun notifyHomeFragment() {
-        val fragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        if (fragment is HomeFragment) {
-            fragment.refreshStatus()
-        }
-    }
+
 
 
     // setupShizukuFeatures removed - Shizuku dependency removed

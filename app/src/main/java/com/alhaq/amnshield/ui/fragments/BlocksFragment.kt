@@ -10,6 +10,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.premium.PremiumManager
 import com.alhaq.amnshield.services.AmnShieldAccessibilityService
+import android.content.ComponentName
+import android.content.Context
+import android.app.admin.DevicePolicyManager
+import com.alhaq.amnshield.receivers.AdminReceiver
 import com.alhaq.amnshield.ui.activity.FragmentActivity
 import com.alhaq.amnshield.ui.fragments.features.BaseFeatureFragment
 import com.alhaq.amnshield.data.blockers.AppBlockScheduleRule
@@ -51,7 +55,11 @@ class BlocksFragment : BaseFeatureFragment() {
                         onNavigateToFocusMode = { openFeatureConfig("focus_mode", requiresPremium = true) },
                         onNavigateToCheatHours = { openCheatHours() },
                         onNavigateToSchedules = { openSchedules() },
-                        onNavigateToLaunchLimits = { openLaunchLimits() }
+                        onNavigateToLaunchLimits = { openLaunchLimits() },
+                        onNavigateToAntiUninstall = { openFeatureConfig("anti_uninstall", requiresPremium = true) },
+                        onNavigateToUsageTracker = { openFeatureConfig("usage_tracker", requiresPremium = false) },
+                        onNavigateToReelsBlocker = { openFeatureConfig("reel_blocker", requiresPremium = true) },
+                        onNavigateToPremium = { openFeatureConfig("premium_features", requiresPremium = false) }
                     )
                 }
             }
@@ -86,10 +94,26 @@ class BlocksFragment : BaseFeatureFragment() {
         val scheduleCount = allSchedules.count { it.type == AppBlockScheduleRule.RuleType.BLOCK }
         val launchLimitCount = blocksLoader.loadAppLaunchLimitRules().size
 
+        val viewBlockerPrefs = requireContext().getSharedPreferences("view_blocker", Context.MODE_PRIVATE)
+        val legacyEnabled = viewBlockerPrefs.getBoolean("is_enabled", false)
+        val reelBlockerPrefs = requireContext().getSharedPreferences("reel_blocker", Context.MODE_PRIVATE)
+        val reelsActive = reelBlockerPrefs.getBoolean("is_enabled", legacyEnabled) && serviceEnabled
+
+        val antiUninstallPrefs = requireContext().getSharedPreferences("anti_uninstall", Context.MODE_PRIVATE)
+        val hasDeviceAdmin = isDeviceAdminEnabled(requireContext())
+        val antiUninstallActive = antiUninstallPrefs.getBoolean("is_anti_uninstall_on", false) && hasDeviceAdmin
+
+        val usageTrackerActive = blocksLoader.isUsageTrackerFeatureEnabled() && serviceEnabled
+
         // Load actual live configurations to AmnShieldState
         viewModel.loadState(
             AmnShieldState(
+                isMainServiceEnabled = serviceEnabled,
+                isPremiumUser = premiumEnabled,
+                isUsageTrackerEnabled = usageTrackerActive,
+                isAntiUninstallEnabled = antiUninstallActive,
                 isAppBlockerEnabled = appActive,
+                isReelsBlockerEnabled = reelsActive,
                 isKeywordBlockerEnabled = keywordActive,
                 isWebFilterEnabled = socialActive,
                 isFocusModeActive = focusActive,
@@ -150,5 +174,11 @@ class BlocksFragment : BaseFeatureFragment() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    private fun isDeviceAdminEnabled(ctx: Context): Boolean {
+        val devicePolicyManager = ctx.getSystemService(Context.DEVICE_POLICY_SERVICE) as? DevicePolicyManager
+        val adminComponent = ComponentName(ctx, AdminReceiver::class.java)
+        return devicePolicyManager?.isAdminActive(adminComponent) == true
     }
 }
