@@ -137,7 +137,6 @@ pinned to an older Gradle version.
 - ✅ Smart Blur toggle is ON
 - ✅ Accessibility service is enabled
 - ✅ Sensitivity is set (Low/Balanced/Strict)
-- ⚠️ Optional: Add `smart_blur_nsfw.tflite` model to assets (works without it)
 
 ---
 
@@ -325,46 +324,6 @@ cancer, support, family, charity, news
 ```
 
 ---
-
-### Test 8: Model vs No-Model Behavior
-
-**Objective**: Compare performance with and without TFLite model
-
-#### Without Model (Default)
-- ✅ Uses 30+ keyword heuristics
-- ✅ Text context analysis
-- ✅ Fast (5-10ms per image)
-- ⚠️ Less accurate for subtle content
-- ⚠️ More false positives possible
-
-**Test**: Remove model from assets (if present)
-1. Go to `app/src/main/assets/`
-2. Rename `smart_blur_nsfw.tflite` → `smart_blur_nsfw.tflite.bak`
-3. Rebuild app
-4. Test same scenarios
-5. Observe: Still works, relies on keywords
-
-#### With Model (Enhanced)
-- ✅ AI-powered image analysis
-- ✅ 90%+ accuracy
-- ✅ Better subtle content detection
-- ⚠️ Slower (80-150ms per image)
-- ⚠️ Requires ~4-6 MB model file
-
-**Test**: Add model
-1. Place `smart_blur_nsfw.tflite` in assets
-2. Rebuild app
-3. Test same scenarios
-4. Compare: Better detection of borderline content
-
-**Log Difference**:
-```
-# Without model:
-# W/SmartImageModerator: Failed to load smart blur model
-
-# With model:
-# (no warning, model loads successfully)
-```
 
 ---
 
@@ -642,32 +601,21 @@ Log.d("TEST", "Verdict: ${result.action}, Confidence: ${result.confidence}")
 3. Check for overly broad keywords
 4. Review context detection logic
 
-### Issue 3: Model Not Loading
-**Symptoms**: Log shows "Failed to load smart blur model"
-
-**Solutions**:
-1. ✅ **This is OK!** App works without model using heuristics
-2. Optional: Add `smart_blur_nsfw.tflite` to assets
-3. Ensure file is valid TFLite format (~4-6 MB)
-4. Rebuild and reinstall app
-
-### Issue 4: Performance Lag
+### Issue 3: Performance Lag
 **Symptoms**: App feels slow, UI stutters
 
 **Solutions**:
 1. Increase throttle time (currently 1200ms)
 2. Reduce image processing frequency
 3. Resize bitmaps before processing (800x800 max)
-4. Consider disabling model for faster processing
 
-### Issue 5: Service Crashes
+### Issue 4: Service Crashes
 **Symptoms**: Accessibility service stops unexpectedly
 
 **Solutions**:
 1. Check logs for exceptions
 2. Verify null safety in bitmap extraction
-3. Ensure try-catch blocks around AI processing
-4. Re-enable service in system settings
+3. Re-enable service in system settings
 
 ---
 
@@ -682,7 +630,6 @@ Before releasing, verify:
 - [ ] Sensitivity levels work as expected
 - [ ] Smart exclusions bypass detection
 - [ ] Safe context reduces false positives
-- [ ] Works with and without ML model
 - [ ] Statistics recorded correctly
 - [ ] No crashes on edge cases
 - [ ] Logs show expected output
@@ -700,29 +647,21 @@ Before releasing, verify:
 ✅ **Private**: 100% on-device processing  
 ✅ **User-Friendly**: Clear UI and controls  
 
----
-
 ## Next Steps After Testing
 
 1. **Collect Metrics**: Track detection accuracy over 1 week
 2. **User Feedback**: Gather reports on false positives/negatives
 3. **Tune Thresholds**: Adjust based on real-world usage
-4. **Add Model**: Download and integrate TFLite model for better accuracy
-5. **Expand Keywords**: Add language-specific terms (Arabic, Urdu, etc.)
-6. **Custom Training**: Train model on Islamic-specific content
+4. **Expand Keywords**: Add language-specific terms (Arabic, Urdu, etc.)
+5. **Custom Training**: Train heuristics on Islamic-specific content
 
 ---
 
 ## Support
 
-**Questions?** Check:
-- `AI_FEATURES.md` - Feature documentation
-- `INTEGRATION_GUIDE.md` - Implementation details
-- `README_MODELS.md` - ML model information
-
 **Issues?** File bug report with:
 - Steps to reproduce
 - Expected vs actual behavior
-- Logs from the AmnShield AI tag: `adb logcat -s AmnShield-AI`
+- Logs from the AmnShield tag: `adb logcat -s AmnShield`
 - Device info (model, Android version)
 - Sensitivity setting used

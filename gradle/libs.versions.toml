@@ -15,8 +15,6 @@ constraintlayout = "2.2.1"
 fragment = "1.8.9"
 mpandroidchart = "v3.1.0"
 timerangepicker = "1.0.0"
-tensorflowLite = "2.17.0"
-tensorflowLiteSupport = "0.5.0"
 playServicesAuth = "21.6.0"
 billing = "9.0.0"
 googleServices = "4.4.4"
@@ -44,10 +42,6 @@ androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", ve
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 provider = { module = "dev.rikka.shizuku:provider", version.ref = "api" }
 timerangepicker = { module = "nl.joery.timerangepicker:timerangepicker", version.ref = "timerangepicker" }
-tensorflow-lite = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tensorflowLite" }
-tensorflow-lite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tensorflowLiteSupport" }
-tensorflow-lite-task-text = { group = "org.tensorflow", name = "tensorflow-lite-task-text", version.ref = "tensorflowLiteSupport" }
-tensorflow-lite-task-vision = { group = "org.tensorflow", name = "tensorflow-lite-task-vision", version.ref = "tensorflowLiteSupport" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }

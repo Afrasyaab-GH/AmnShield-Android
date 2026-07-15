@@ -96,13 +96,6 @@
     <fields>;
     <init>(...);
 }
-
-# ==================== TensorFlow Lite ====================
--keep class org.tensorflow.lite.** { *; }
--keep class org.tensorflow.lite.support.** { *; }
--keepclassmembers class org.tensorflow.lite.** { *; }
--dontwarn org.tensorflow.lite.**
-
 # Keep native methods
 -keepclasseswithmembernames class * {
     native <methods>;
