@@ -6,12 +6,17 @@
         android:title="@string/stats" />
 
     <item
-        android:id="@+id/navigation_reports"
-        android:icon="@drawable/ic_amnshield_reports"
-        android:title="@string/reports" />
-
-    <item
         android:id="@+id/navigation_blocks"
         android:icon="@drawable/baseline_lock_24"
         android:title="@string/blocks" />
+
+    <item
+        android:id="@+id/navigation_focus"
+        android:icon="@drawable/ic_focus_mode"
+        android:title="Focus" />
+
+    <item
+        android:id="@+id/navigation_reports"
+        android:icon="@drawable/ic_amnshield_reports"
+        android:title="@string/reports" />
 </menu>

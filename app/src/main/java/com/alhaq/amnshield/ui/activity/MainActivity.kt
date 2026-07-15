@@ -57,6 +57,7 @@ import com.alhaq.amnshield.ui.fragments.BlocksFragment
 import com.alhaq.amnshield.ui.fragments.StatsFragment
 import com.alhaq.amnshield.ui.fragments.SettingsFragment
 import com.alhaq.amnshield.ui.fragments.ReportsFragment
+import com.alhaq.amnshield.ui.fragments.FocusFragment
 import com.alhaq.amnshield.ui.activity.FragmentActivity
 import com.alhaq.amnshield.ui.fragments.installation.AccessibilityGuide
 import com.alhaq.amnshield.ui.fragments.installation.WelcomeFragment
@@ -211,6 +212,7 @@ class MainActivity : AppCompatActivity() {
             val initialFragment = when (startTab) {
                 R.id.navigation_reports -> ReportsFragment()
                 R.id.navigation_blocks -> BlocksFragment()
+                R.id.navigation_focus -> FocusFragment()
                 else -> StatsFragment()
             }
             supportFragmentManager.beginTransaction()
@@ -227,15 +229,21 @@ class MainActivity : AppCompatActivity() {
                         .commit()
                     true
                 }
-                R.id.navigation_reports -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.nav_host_fragment, ReportsFragment())
-                        .commit()
-                    true
-                }
                 R.id.navigation_blocks -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment, BlocksFragment())
+                        .commit()
+                    true
+                }
+                R.id.navigation_focus -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, FocusFragment())
+                        .commit()
+                    true
+                }
+                R.id.navigation_reports -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, ReportsFragment())
                         .commit()
                     true
                 }

@@ -169,20 +169,6 @@ fun BlocksScreen(
                         onChecked = onNavigateToReelsBlocker,
                         iconColor = Color(0xFFF43F5E)
                     )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                    )
-
-                    BlockItemRow(
-                        icon = Icons.Outlined.Timer,
-                        title = "Focus Mode",
-                        summary = "Time-boxed deep focus sessions",
-                        statusText = if (state.isFocusModeActive) "ON" else "OFF",
-                        onChecked = onNavigateToFocusMode,
-                        iconColor = Color(0xFF14B8A6)
-                    )
                 }
             }
         }
