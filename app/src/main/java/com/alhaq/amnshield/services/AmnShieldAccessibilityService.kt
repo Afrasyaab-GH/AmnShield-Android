@@ -825,7 +825,8 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
                     }
                 }
                 
-                if (nodeText.contains("amnshield") && nodeText.contains("accessibility")) {
+                val appLabel = getAppLabelLowercase()
+                if ((nodeText.contains(appLabel) || nodeText.contains("amnshield") || nodeText.contains("deenshield")) && nodeText.contains("accessibility")) {
                     if (checkForToggleContext(windowRoot)) {
                         onScreenDetected("accessibility_amnshield", null)
                         if (current != root) current.recycle()
@@ -1001,8 +1002,17 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
         return found
     }
 
+    private fun getAppLabelLowercase(): String {
+        return try {
+            packageManager.getApplicationLabel(applicationInfo).toString().lowercase(Locale.ROOT)
+        } catch (e: Exception) {
+            "amnshield"
+        }
+    }
+
     private fun checkForAmnShieldMention(root: AccessibilityNodeInfo?): Boolean {
         root ?: return false
+        val appLabel = getAppLabelLowercase()
         val stack = java.util.ArrayDeque<AccessibilityNodeInfo>()
         stack.push(root)
         
@@ -1012,7 +1022,7 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
             
             if (current.className != null && current.className == "android.widget.TextView") {
                 val nodeText = current.text?.toString()?.lowercase(Locale.ROOT) ?: ""
-                if (nodeText.contains("amnshield")) {
+                if (nodeText.contains(appLabel) || nodeText.contains("amnshield") || nodeText.contains("deenshield")) {
                     found = true
                 }
             }
