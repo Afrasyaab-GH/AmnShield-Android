@@ -115,6 +115,7 @@ class FocusFragment : BaseFeatureFragment() {
                         onStartFocusSession = { durationMinutes, mode, selectedApps ->
                             checkNotificationPermissionAndStart(durationMinutes, mode, selectedApps)
                         },
+                        onStopFocusSession = { stopFocusSession() },
                         onConfigureApps = { configureApps() },
                         onConfigureSchedules = { configureSchedules() },
                         onEnableService = { enableService() }
@@ -122,6 +123,17 @@ class FocusFragment : BaseFeatureFragment() {
                 }
             }
         }
+    }
+
+    private fun stopFocusSession() {
+        loader.stopFocusSession()
+        val timer = NotificationTimerManager(requireContext())
+        timer.stopTimer()
+        val intent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE).apply {
+            setPackage(requireContext().packageName)
+        }
+        requireContext().sendBroadcast(intent)
+        refreshFocusState()
     }
 
     override fun onResume() {
@@ -181,7 +193,12 @@ class FocusFragment : BaseFeatureFragment() {
         requireContext().sendBroadcast(intent)
         
         val timer = NotificationTimerManager(requireContext())
-        timer.startTimer(durationMillis)
+        timer.startTimer(
+            totalMillis = durationMillis,
+            onFinishCallback = {
+                stopFocusSession()
+            }
+        )
         
         refreshFocusState()
     }

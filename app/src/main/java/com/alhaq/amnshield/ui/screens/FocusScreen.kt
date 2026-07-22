@@ -56,6 +56,7 @@ fun FocusScreen(
     preSelectedApps: Set<String>,
     defaultMode: Int,
     onStartFocusSession: (Int, Int, Set<String>) -> Unit,
+    onStopFocusSession: () -> Unit = {},
     onConfigureApps: () -> Unit,
     onConfigureSchedules: () -> Unit,
     onEnableService: () -> Unit
@@ -283,12 +284,30 @@ fun FocusScreen(
                             )
                         }
                     } else {
-                        Text(
-                            text = "Timer handles lock. Enjoy focus!",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Button(
+                            onClick = onStopFocusSession,
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Block,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Stop Focus Session ⏹️",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }

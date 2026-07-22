@@ -594,6 +594,7 @@ class AmnShieldAccessibilityService : BaseBlockingService() {
     private fun setupFocusMode() {
         val focusModeData = savedPreferencesLoader.getFocusModeData()
         focusModeBlocker.update(focusModeData)
+        com.alhaq.amnshield.ui.widgets.QuickFocusWidgetProvider.updateAllWidgets(this)
     }
 
 

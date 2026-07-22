@@ -3,9 +3,11 @@ package com.alhaq.amnshield.ui.widgets
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import com.alhaq.amnshield.R
 import com.alhaq.amnshield.blockers.FocusModeBlocker
@@ -21,7 +23,24 @@ class QuickFocusWidgetProvider : AppWidgetProvider() {
         private const val ACTION_START_FOCUS_15 = "com.alhaq.amnshield.focus.START_15"
         private const val ACTION_START_FOCUS_30 = "com.alhaq.amnshield.focus.START_30"
         private const val ACTION_START_FOCUS_60 = "com.alhaq.amnshield.focus.START_60"
+        private const val ACTION_STOP_FOCUS = "com.alhaq.amnshield.focus.STOP_FOCUS"
         private const val ACTION_WIDGET_REFRESH = "com.alhaq.amnshield.focus.WIDGET_REFRESH"
+
+        fun updateAllWidgets(context: Context) {
+            try {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val componentName = ComponentName(context, QuickFocusWidgetProvider::class.java)
+                val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
+                if (widgetIds != null && widgetIds.isNotEmpty()) {
+                    val intent = Intent(context, QuickFocusWidgetProvider::class.java).apply {
+                        action = ACTION_WIDGET_REFRESH
+                    }
+                    context.sendBroadcast(intent)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error triggering updateAllWidgets", e)
+            }
+        }
     }
 
     override fun onUpdate(
@@ -46,10 +65,12 @@ class QuickFocusWidgetProvider : AppWidgetProvider() {
                 else -> 30
             }
             startFocusSessionFromWidget(context, minutes)
+        } else if (action == ACTION_STOP_FOCUS) {
+            stopFocusSessionFromWidget(context)
         }
 
         val appWidgetManager = AppWidgetManager.getInstance(context)
-        val componentName = android.content.ComponentName(context, QuickFocusWidgetProvider::class.java)
+        val componentName = ComponentName(context, QuickFocusWidgetProvider::class.java)
         val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
         widgetIds?.forEach { widgetId ->
             updateWidget(context, appWidgetManager, widgetId)
@@ -79,7 +100,25 @@ class QuickFocusWidgetProvider : AppWidgetProvider() {
         context.sendBroadcast(refreshIntent)
 
         val timer = NotificationTimerManager(context)
-        timer.startTimer(durationMillis)
+        timer.startTimer(
+            totalMillis = durationMillis,
+            onFinishCallback = {
+                stopFocusSessionFromWidget(context)
+            }
+        )
+    }
+
+    private fun stopFocusSessionFromWidget(context: Context) {
+        val loader = SavedPreferencesLoader(context)
+        loader.stopFocusSession()
+
+        val timer = NotificationTimerManager(context)
+        timer.stopTimer()
+
+        val refreshIntent = Intent(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE).apply {
+            setPackage(context.packageName)
+        }
+        context.sendBroadcast(refreshIntent)
     }
 
     private fun updateWidget(
@@ -98,10 +137,21 @@ class QuickFocusWidgetProvider : AppWidgetProvider() {
                     setTextViewText(R.id.txt_focus_status_badge, "ACTIVE 🔥")
                     setTextViewText(R.id.txt_focus_timer_display, "${remainingMins}m Remaining")
                     setTextViewText(R.id.txt_focus_subtitle, "Focus session active")
+
+                    setViewVisibility(R.id.layout_active_focus_controls, View.VISIBLE)
+                    setViewVisibility(R.id.layout_quick_start_buttons, View.GONE)
+
+                    setOnClickPendingIntent(
+                        R.id.btn_stop_focus,
+                        createActionIntent(context, widgetId, ACTION_STOP_FOCUS)
+                    )
                 } else {
                     setTextViewText(R.id.txt_focus_status_badge, "READY ⚡")
                     setTextViewText(R.id.txt_focus_timer_display, "Ready to Focus")
                     setTextViewText(R.id.txt_focus_subtitle, "Tap a preset to start instant session")
+
+                    setViewVisibility(R.id.layout_active_focus_controls, View.GONE)
+                    setViewVisibility(R.id.layout_quick_start_buttons, View.VISIBLE)
                 }
 
                 // Preset button pending intents

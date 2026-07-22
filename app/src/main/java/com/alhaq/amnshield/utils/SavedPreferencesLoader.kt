@@ -346,6 +346,20 @@ class SavedPreferencesLoader(val context: Context) {
         }
         
         data.selectedApps = getFocusModeSelectedApps().toHashSet()
+
+        // Auto-expire session if end time has passed
+        if (data.isTurnedOn && data.endTime > 0 && System.currentTimeMillis() >= data.endTime) {
+            val expiredData = FocusModeBlocker.FocusModeData(
+                isTurnedOn = false,
+                endTime = 0L,
+                modeType = data.modeType,
+                selectedApps = data.selectedApps
+            )
+            saveFocusModeData(expiredData)
+            completeFocusSession()
+            return expiredData
+        }
+
         return data
     }
     
@@ -357,6 +371,19 @@ class SavedPreferencesLoader(val context: Context) {
             .apply()
     }
     
+    fun stopFocusSession() {
+        val currentData = getFocusModeData()
+        saveFocusModeData(
+            FocusModeBlocker.FocusModeData(
+                isTurnedOn = false,
+                endTime = 0L,
+                modeType = currentData.modeType,
+                selectedApps = currentData.selectedApps
+            )
+        )
+        completeFocusSession()
+    }
+
     fun completeFocusSession() {
         val sharedPreferences = context.getSharedPreferences("focus_mode", Context.MODE_PRIVATE)
         val startTime = sharedPreferences.getLong("focus_session_start", -1)

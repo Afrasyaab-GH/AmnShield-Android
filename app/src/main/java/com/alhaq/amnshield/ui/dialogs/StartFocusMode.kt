@@ -156,7 +156,13 @@ class StartFocusMode(
         
         sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
         val timer = NotificationTimerManager(requireContext())
-        timer.startTimer(duration)
+        timer.startTimer(
+            totalMillis = duration,
+            onFinishCallback = {
+                savedPreferencesLoader?.stopFocusSession()
+                sendRefreshRequest(AmnShieldAccessibilityService.INTENT_ACTION_REFRESH_FOCUS_MODE)
+            }
+        )
         onPositiveButtonPressed()
     }
 

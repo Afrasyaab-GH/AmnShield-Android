@@ -123,16 +123,15 @@ class FocusModeBlocker : BaseBlocker() {
 
         // 1. Check if manual focus mode is turned on
         if (focusModeData.isTurnedOn) {
-            if (focusModeData.endTime in 1 until System.currentTimeMillis()) {
+            if (focusModeData.endTime > 0 && System.currentTimeMillis() >= focusModeData.endTime) {
                 focusModeData.isTurnedOn = false
                 return FocusModeResult(isBlocked = false, isRequestingToUpdateSPData = true)
             }
             return evaluateBlocking(packageName, focusModeData.modeType, focusModeData.selectedApps, focusModeData.endTime)
         }
 
-        // 2. AutoFocus schedule active evaluation
-        val configuredFocusData = savedPreferencesLoader.getFocusModeData()
-        return evaluateBlocking(packageName, configuredFocusData.modeType, configuredFocusData.selectedApps, -1)
+        // When Focus Mode is off, apps are not blocked by manual Focus Mode
+        return FocusModeResult(isBlocked = false)
     }
 
     private fun evaluateBlocking(packageName: String, modeType: Int, selectedApps: Set<String>, endTime: Long): FocusModeResult {
