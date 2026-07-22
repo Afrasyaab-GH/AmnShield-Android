@@ -1,6 +1,6 @@
 # AmnShield Roadmap
 
-Last updated: 2026-07-18
+Last updated: 2026-07-22
 
 ## Strategic Architectural Decisions (July 2026)
 - **Web Administration Portal Transition:**
@@ -9,6 +9,22 @@ Last updated: 2026-07-18
   - **Client Impact:** The main `AmnShield-Android` app retains its local bound API (`IAmnShieldApi.aidl` and `AmnShieldApiService.kt`) for local extensibility, but will utilize HTTPS REST sync against Supabase for parental remote configuration instead of native inter-app IPC.
 
 ## Recently Completed
+- **Focus Space Architecture Unification & Auto Focus Schedules (July 2026)**
+  - Unified Focus Space into two clean modes: **Quick Focus Sessions** (Mode A - instant timer) and **Auto Focus Schedules** (Mode B - time window schedules & active days).
+  - Added `"Focus Mode"` to schedule target options in `BlocksManagerFragment`.
+  - Configured `CreateRuleScreen` as an Auto Focus Schedule Creator with clock time pickers, active days selection, whitelisting/blacklisting mode options, and app selection.
+- **App Blocker Legacy View Cleanup (July 2026)**
+  - Cleaned up `AppBlockerConfigFragment` to route directly to `BlocksManagerFragment`.
+  - Removed legacy `SelectAppsActivity` launchers and legacy auto-block card views, ensuring 100% rule-based management routing.
+- **Android Home Screen Widgets Suite & In-App Widgets Manager (July 2026)**
+  - **Screen Time Widget (`ScreentimeWidgetProvider`):** Emerald Calm dark glass card displaying live daily total screen time and top 3 app usage formatting.
+  - **Reels & Shorts Metrics Widget (`ReelsMetricsWidgetProvider`):** Live count of Reels scrolled today, daily limit progress, and active status badge.
+  - **Quick Focus Space Widget (`QuickFocusWidgetProvider`):** Active countdown display with 3 interactive 1-tap quick start buttons (`15m`, `30m`, `60m`).
+  - **Mindful Breathing Space Widget (`BreathingWidgetProvider`):** 1-tap launcher for interactive Mindful Breathing in Focus Space.
+  - **In-App Widgets Manager:** Built live preview cards and 1-tap Android widget pinning (`requestPinAppWidget`) in `SettingsScreen.kt`.
+- **Widget RemoteViews Inflation & Click Target Fixes (July 2026)**
+  - Replaced unsupported layout tags (`<Spacer>` and `<View>`) with `<FrameLayout>` across widget XML layouts to eliminate Android Launcher `InflateException` ("Couldn't load widget").
+  - Fixed click target binding by removing root layout click listeners (`widget_bg_...`) and binding screen navigation to specific title text views, allowing inner buttons (`15m`, `30m`, `60m`, refresh) to execute without click interception.
 - **Blocker Rules Redesign & Always Block Mode (July 2026)**
   - Removed implicit 24/7 fallbacks from background services, ensuring Keyword Blocker, Website Blocker, and Reels Blocker only run if there is an explicit database rule configured.
   - Added mutually exclusive "Always Block (24/7)" and "Block Schedule" options to rule creator screens for App Blocker, Keyword Blocker, Website Blocker, and Reels Blocker.
