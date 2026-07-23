@@ -13,6 +13,9 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 
     <permission
         android:name="com.alhaq.amnshield.permission.BIND_API"
@@ -219,6 +222,27 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_breathing_metadata" />
+        </receiver>
+
+        <receiver
+            android:name=".notifications.BootAndAlarmReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".notifications.NotificationActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.alhaq.amnshield.notifications.START_QUICK_FOCUS" />
+                <action android:name="com.alhaq.amnshield.notifications.SNOOZE_BLOCK" />
+                <action android:name="com.alhaq.amnshield.notifications.QUICK_BLOCK_APP" />
+            </intent-filter>
         </receiver>
 
     </application>

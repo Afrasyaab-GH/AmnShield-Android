@@ -159,6 +159,28 @@ class NotificationHelper(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
+        val focusIntent = Intent(context, com.alhaq.amnshield.notifications.NotificationActionReceiver::class.java).apply {
+            action = com.alhaq.amnshield.notifications.NotificationActionReceiver.ACTION_START_QUICK_FOCUS
+            putExtra(com.alhaq.amnshield.notifications.NotificationActionReceiver.EXTRA_MINUTES, 25)
+        }
+        val focusPendingIntent = PendingIntent.getBroadcast(
+            context,
+            1,
+            focusIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val snoozeIntent = Intent(context, com.alhaq.amnshield.notifications.NotificationActionReceiver::class.java).apply {
+            action = com.alhaq.amnshield.notifications.NotificationActionReceiver.ACTION_SNOOZE_BLOCK
+            putExtra(com.alhaq.amnshield.notifications.NotificationActionReceiver.EXTRA_MINUTES, 15)
+        }
+        val snoozePendingIntent = PendingIntent.getBroadcast(
+            context,
+            2,
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID_REMINDERS)
             .setSmallIcon(R.drawable.ic_logo_mini)
             .setContentTitle(title)
@@ -166,6 +188,8 @@ class NotificationHelper(private val context: Context) {
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_logo_mini, "🎯 Start 25m Focus", focusPendingIntent)
+            .addAction(R.drawable.ic_logo_mini, "⏰ Snooze 15m", snoozePendingIntent)
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .build()
