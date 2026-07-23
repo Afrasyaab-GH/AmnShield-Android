@@ -88,9 +88,17 @@
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
 
-# Keep data classes for Gson serialization
+# Keep data classes for Gson serialization & Jetpack Compose state
 -keep class com.alhaq.amnshield.models.** { *; }
 -keepclassmembers class com.alhaq.amnshield.models.** { *; }
+-keep class com.alhaq.amnshield.data.** { *; }
+-keepclassmembers class com.alhaq.amnshield.data.** { *; }
+-keep class com.alhaq.amnshield.ui.state.** { *; }
+-keepclassmembers class com.alhaq.amnshield.ui.state.** { *; }
+-keep class com.alhaq.amnshield.ui.activity.MainActivity$** { *; }
+-keepclassmembers class com.alhaq.amnshield.ui.activity.MainActivity$** { *; }
+-keep class com.alhaq.amnshield.notifications.** { *; }
+-keepclassmembers class com.alhaq.amnshield.notifications.** { *; }
 -keep class com.alhaq.amnshield.blockers.** { *; }
 -keepclassmembers class com.alhaq.amnshield.blockers.** { 
     <fields>;
