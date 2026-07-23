@@ -41,6 +41,41 @@ class ManageLaunchLimitsFragment : Fragment() {
         return binding.root
     }
 
+    private val selectAppsLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val selectedApps = result.data?.getStringArrayListExtra("SELECTED_APPS")
+            val firstPkg = selectedApps?.firstOrNull()
+            if (!firstPkg.isNullOrEmpty()) {
+                try {
+                    val appInfo = requireContext().packageManager.getApplicationInfo(firstPkg, 0)
+                    val appName = appInfo.loadLabel(requireContext().packageManager).toString()
+
+                    val dialog = SetLaunchLimitDialog(
+                        packageName = firstPkg,
+                        appName = appName,
+                        onSave = { rule ->
+                            if (rule != null) {
+                                savedPrefs.addAppLaunchLimitRule(rule)
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Launch limit saved: ${rule.getDescription()}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                sendRefreshRequest()
+                                loadLaunchLimits()
+                            }
+                        }
+                    )
+                    dialog.show(childFragmentManager, "add_launch_limit_$firstPkg")
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Could not set limit for selected app", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -68,6 +103,16 @@ class ManageLaunchLimitsFragment : Fragment() {
                 requireActivity().finish()
             }
         }
+
+        // Setup add limit actions
+        val openAppPicker = {
+            val intent = Intent(requireContext(), com.alhaq.amnshield.ui.activity.SelectAppsActivity::class.java).apply {
+                putExtra("SINGLE_SELECTION", true)
+            }
+            selectAppsLauncher.launch(intent)
+        }
+        binding.fabAddLimit.setOnClickListener { openAppPicker() }
+        binding.btnAddLimitEmpty.setOnClickListener { openAppPicker() }
 
         // Setup adapter
         adapter = LaunchLimitAdapter(
